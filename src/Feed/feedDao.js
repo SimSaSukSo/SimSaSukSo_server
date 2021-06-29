@@ -17,7 +17,8 @@ async function homeTestDao(region) {
     FROM Feed f
     JOIN Airbnb a ON f.lodgingIndex = a.airbnbIndex
     JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
-    WHERE f.lodgingType = 2 AND fi.uploadOrder = 1;
+    WHERE f.lodgingType = 2 AND fi.uploadOrder = 1
+    LIMIT 5;
     `;
   
     const [rows] = await connection.query(Query)
@@ -47,7 +48,8 @@ async function homeTestDao(region) {
     WHERE f.lodgingType = 2 AND fi.uploadOrder = 1) as lodging
     JOIN FeedTag ft ON lodging.feedIndex = ft.feedIndex
     JOIN HashTag ht ON ft.hashTagIndex = ht.hashTagIndex
-    GROUP BY lodging.feedIndex;
+    GROUP BY lodging.feedIndex
+    LIMIT 3;
     `;
   
     const [rows] = await connection.query(Query)
