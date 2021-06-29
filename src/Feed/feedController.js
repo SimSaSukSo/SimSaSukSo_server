@@ -5,6 +5,8 @@ const {response, errResponse} = require("../../config/response");
 
 const feedDao = require('./feedDao');
 
+const feedPerPage = 24;
+
 /**
  * update : 2021.06.29.
  * desc : 홈 화면 제공 API
@@ -91,8 +93,51 @@ exports.index = async function (req, res) {
     }
 };
 
+/**
+ * update : 2021.06.30.
+ * desc : 인기 피드 제공 API
+ */
 exports.hot = async function (req, res) {
-    
+    // 페이지 유효성 검사
+    let page = req.query.page;
+
+    if (!page) page = 1;
+
+    page = parseInt(page, 10);
+    if (Number.isNaN(page)) return res.json(errResponse(baseResponse.PAGE_WRONG));
+
+    try {
+        // 인기 해시태그, 피드 제공 + 페이징
+        let hashTags;
+        let feeds;
+
+        // 인기 해시태그 조회
+        try {
+            hashTags = await feedDao.hotFeedHotHashTagTest();
+        } catch (err) {
+            logger.error(`인기 해시태그 조회 중 Error\n: ${JSON.stringify(err)}`);
+            return res.json(errResponse(baseResponse.DB_ERROR));
+        }
+        // 페이지에 따라서 피드 조회
+        try {
+            feeds = await feedDao.hotFeedTest((page-1) * feedPerPage);
+        } catch (err) {
+            logger.error(`인기 피드 조회 중 Error\n: ${JSON.stringify(err)}`);
+            return res.json(errResponse(baseResponse.DB_ERROR));
+        }
+
+        const result = {
+            hashTags,
+            feeds
+        };
+
+        // 인기 피드 조회 성공
+        return res.send(response(baseResponse.SUCCESS, result));
+
+    } catch (err) {
+        logger.error(`인기 피드 제공 API Error\n: ${JSON.stringify(err)}`);
+        return res.json(errResponse(baseResponse.SERVER_ERROR));
+    }
 };
 
 exports.new = async function (req, res) {

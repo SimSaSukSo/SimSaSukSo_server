@@ -47,6 +47,7 @@ module.exports = {
     KAKAOUSER_REDUNDANT : {"isSuccess": false, "code": 3007, "message": "이미 가입된 유저입니다. 바로 로그인해주세요." },
 
     REGION_WRONG : { "isSuccess": false, "code": 3030, "message": "유효하지 않은 지역입니다." },
+    PAGE_WRONG : { "isSuccess": false, "code": 3031, "message": "유효하지 않은 페이지입니다." },
 
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},
