@@ -111,6 +111,12 @@ exports.hot = async function (req, res) {
         let hashTags;
         let feeds;
 
+        /**
+         * Todo (when 210630)
+         * 1. 인기 해시태그 선정 방법
+         * 2. 각 해시태그에 대한 background image 선정 방법
+         * 3. 인기 피드 선정 방법
+         */
         // 인기 해시태그 조회
         try {
             hashTags = await feedDao.hotFeedHotHashTagTest();
@@ -140,6 +146,40 @@ exports.hot = async function (req, res) {
     }
 };
 
+/**
+ * update : 2021.06.30.
+ * desc : 최신 피드 제공 API
+ */
 exports.new = async function (req, res) {
-    
+    // 페이지 유효성 검사
+    let page = req.query.page;
+
+    if (!page) page = 1;
+
+    page = parseInt(page, 10);
+    if (Number.isNaN(page)) return res.json(errResponse(baseResponse.PAGE_WRONG));
+
+    try {
+        // 피드 제공 + 페이징
+        let feeds;
+
+        // 페이지에 따라서 피드 조회
+        try {
+            feeds = await feedDao.newFeedTest((page-1) * feedPerPage);
+        } catch (err) {
+            logger.error(`최신 피드 조회 중 Error\n: ${JSON.stringify(err)}`);
+            return res.json(errResponse(baseResponse.DB_ERROR));
+        }
+
+        const result = {
+            feeds
+        };
+
+        // 최신 피드 조회 성공
+        return res.send(response(baseResponse.SUCCESS, result));
+
+    } catch (err) {
+        logger.error(`최신 피드 제공 API Error\n: ${JSON.stringify(err)}`);
+        return res.json(errResponse(baseResponse.SERVER_ERROR));
+    }
 };

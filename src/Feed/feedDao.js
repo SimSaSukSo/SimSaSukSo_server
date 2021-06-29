@@ -124,9 +124,47 @@ async function homeTestDao(region) {
   return rows;
 }
 
+/**
+ * update : 2021.06.30.
+ * desc : [Dummy] 최신 피드 제공
+ */
+ async function newFeedTest(offset) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  const Query = `
+  SELECT lodging.feedIndex, lodging.source, lodging.name, lodging.reliability, lodging.degree
+  FROM ((SELECT f.feedIndex, source, gl.name as name,
+        FORMAT(IF (AVG(r.degree), AVG(r.degree)*20, 0), 0) as reliability,
+        f.correctionDegree as degree, f.createdAt
+  FROM Feed f
+  JOIN GeneralLodging gl ON f.lodgingIndex = gl.generalLodgingIndex
+  JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
+  LEFT JOIN Reliability r ON f.feedIndex = r.feedIndex
+  WHERE f.lodgingType = 1 AND fi.uploadOrder = 1
+  GROUP BY f.feedIndex)
+  UNION
+  (SELECT f.feedIndex, source, (SELECT '서울 에어비엔비') as name,
+        FORMAT(IF (AVG(r.degree), AVG(r.degree)*20, 0), 0) as reliability,
+        f.correctionDegree as degree, f.createdAt
+  FROM Feed f
+  JOIN Airbnb a ON f.lodgingIndex = a.airbnbIndex
+  JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
+  LEFT JOIN Reliability r ON f.feedIndex = r.feedIndex
+  WHERE f.lodgingType = 2 AND fi.uploadOrder = 1
+  GROUP BY f.feedIndex)) as lodging
+  ORDER BY lodging.createdAt DESC
+  LIMIT 24 OFFSET ${offset};
+  `;
+
+  const [rows] = await connection.query(Query)
+  connection.release();
+
+  return rows;
+}
+
 module.exports = {
     homeTestDao,
     homeTestWithTagDao,
     hotFeedHotHashTagTest,
     hotFeedTest,
+    newFeedTest,
 };
