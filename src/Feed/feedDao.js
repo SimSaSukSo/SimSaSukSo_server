@@ -80,7 +80,7 @@ async function homeTestDao(region) {
   JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
   WHERE f.lodgingType = 2 AND fi.uploadOrder = 1) as lodging ON ft.feedIndex = lodging.feedIndex
   GROUP BY ht.keyword
-  LIMIT 5;
+  LIMIT 10;
   `;
 
   const [rows] = await connection.query(Query)
