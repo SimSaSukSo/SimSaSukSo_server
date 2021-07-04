@@ -1,6 +1,6 @@
 module.exports = function(app){
     const user = require('./userController');
-    const jwtMiddleware = require('../../../config/jwtMiddleware');
+    const jwtMiddleware = require('../../config/jwtMiddleware');
 
     // 1. 카카오 소셜 로그인/ 회원가입 API
     app.route('/api/users/kakaoLogin').post(user.kakaoLogin)

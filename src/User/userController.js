@@ -1,14 +1,14 @@
-const jwtMiddleware = require("../../../config/jwtMiddleware");
-const userProvider = require("../../app/User/userProvider");
-const {logger} = require("../../../config/winston");
-const userService = require("../../app/User/userService");
-const baseResponse = require("../../../config/baseResponseStatus");
-const {response, errResponse} = require("../../../config/response");
+const jwtMiddleware = require("../../config/jwtMiddleware");
+const userProvider = require("../../src/User/userProvider");
+const {logger} = require("../../config/winston");
+const userService = require("../../src/User/userService");
+const baseResponse = require("../../config/baseResponseStatus");
+const {response, errResponse} = require("../../config/response");
 const axios = require("axios");
 const regexEmail = require("regex-email");
 const {emit} = require("nodemon");
 const jwt = require("jsonwebtoken");
-const secret_config = require("../../../config/secret");
+const secret_config = require("../../config/secret");
 
 /**
  * API No. 1
