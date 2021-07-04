@@ -17,7 +17,7 @@ module.exports = function () {
     app.use(cors());
 
     /* App (Android, iOS) */
-    require('../src/app/routes/indexRoute')(app);
+    require('../src/app/User/userRoute')(app);
 
     return app;
 };

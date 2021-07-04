@@ -8,6 +8,7 @@ module.exports = {
     TOKEN_VERIFICATION_FAILURE : { "isSuccess": false, "code": 3000, "message":"JWT 토큰 검증 실패" },
     TOKEN_VERIFICATION_SUCCESS : { "isSuccess": true, "code": 1001, "message":"JWT 토큰 검증 성공" }, // ?
     ACCESSTOKEN_EMPTY : {"isSuccess": false, "code": 2000, "message":"액세스 토큰을 입력해주세요."},
+    ACCESSTOKEN_ERROR : { "isSuccess": false, "code": 2019, "message": "액세스 토큰 에러" },
 
     //Request error
     SIGNUP_EMAIL_EMPTY : { "isSuccess": false, "code": 2001, "message":"이메일을 입력해주세요" },
