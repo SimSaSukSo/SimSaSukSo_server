@@ -18,6 +18,7 @@ module.exports = function () {
 
     /* App (Android, iOS) */
     require('../src/User/userRoute')(app);
+    require('../src/Feed/feedRoute')(app);
 
     return app;
 };
