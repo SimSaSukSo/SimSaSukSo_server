@@ -36,3 +36,17 @@ exports.kakaoCreateUser = async function (nickname, kaokaoId, avartarUrl, email)
         return errResponse(baseResponse.DB_ERROR);
     }
 };
+
+// 닉네임 설정
+exports.setNickname = async function(nickname, kakaoId) {
+    try {
+        const connection = await pool.getConnection(async (conn) => conn);
+        const insertUserInfoParams = [nickname, kakaoId];
+        const setNicknameResult = await userDao.updateUserNickname(connection, insertUserInfoParams);
+        connection.release();
+        return response(baseResponse.SUCCESS);
+    } catch (err) {
+        logger.error(`App - setNickname Service error\n: ${err.message}`);
+        return errResponse(baseResponse.DB_ERROR);
+    }
+};

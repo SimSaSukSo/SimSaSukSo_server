@@ -13,3 +13,11 @@ exports.retrieveUser = async function (email) {
 
   return userResult;
 };
+
+exports.retrieveNickname = async function(nickname) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  const [nicknameResult] = await userDao.selectUserNickname(connection, nickname);
+  connection.release();
+
+  return nicknameResult;
+};

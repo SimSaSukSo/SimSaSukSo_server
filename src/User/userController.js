@@ -77,6 +77,7 @@ const secret_config = require("../../config/secret");
             }
 
         }).catch(function (error) {
+            console.log(error);
             result = errResponse(baseResponse.ACCESSTOKEN_ERROR);
             
             try {
@@ -97,4 +98,65 @@ const secret_config = require("../../config/secret");
         logger.error(`카카오 소셜 로그인/회원가입 중 Error\n: ${JSON.stringify(err)}`);
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
+};
+
+/**
+ * API No. 2
+ * API Name : 닉네임 설정
+ * [POST] /app/users
+ */
+exports.setNickname = async function (req, res) {
+    const nickname = req.query.nickname;
+
+    const token = req.verifiedToken;
+    const kakaoId = token.kakaoId;
+
+    // 닉네임 입력받음
+    if (!nickname) {
+        return res.json(errResponse(baseResponse.NICKNAME_EMPTY));
+    }
+
+    try {
+        // 영문/숫자 포함 8자 이내 확인
+        var regType = /^[A-Za-z0-9+]{0,8}$/;
+        try {
+            if (!regType.test(nickname.toString())) {
+                console.log(regType.test((nickname).value));
+                return res.json(errResponse(baseResponse.NICKNAME_INVALID));
+            }
+        } catch (err) {
+            console.log(err);
+            logger.error(`닉네임 영문/숫자 포함 8자 이내 여부 확인 중 Error`);
+            return res.json(errResponse(baseResponse.DB_ERROR));
+        }
+        
+        try {
+            // 닉네임 중복 여부 확인
+            const nicknameList = await userProvider.retrieveNickname(nickname);
+            console.log(nicknameList);
+            if (nicknameList) {
+                return res.json(errResponse(baseResponse.NICKNAME_REDUNDANT));
+            }
+        } catch (err) {
+            console.log(err);
+            logger.error(`닉네임 중복 여부 확인 중 Error`);
+            return res.json(errResponse(baseResponse.DB_ERROR));
+        }
+
+        try {
+            // 닉네임 설정
+            const nicknameResponse = await userService.setNickname(nickname, kakaoId);
+            return res.send(nicknameResponse);
+        } catch (err) {
+            logger.error(`닉네임 설정 중 Error\n: ${JSON.stringify(err)}`);
+            return res.json(errResponse(baseResponse.DB_ERROR));
+        }
+
+        
+
+    } catch(err) {
+        logger.error(`닉네임 설정 API 중 Error\n: ${JSON.stringify(err)}`);
+        return res.json(errResponse(baseResponse.DB_ERROR));
+    }
+
 };
