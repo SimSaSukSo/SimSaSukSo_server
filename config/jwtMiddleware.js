@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const secret_config = require('./secret');
 const baseResponse = require("./baseResponseStatus");
+const errResponse = require('./response');
 
 const jwtMiddleware = (req, res, next) => {
     // read the token from header or url
