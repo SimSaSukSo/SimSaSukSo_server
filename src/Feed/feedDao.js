@@ -97,7 +97,7 @@ async function homeTestDao(region) {
   const connection = await pool.getConnection(async (conn) => conn);
   const Query = `
   SELECT f.feedIndex, source, gl.name as name,
-    FORMAT(IF (AVG(r.degree), AVG(r.degree)*20, 0), 0) as reliability,
+    CAST(FORMAT(IF (AVG(r.degree), AVG(r.degree)*20, 0), 0) as unsigned) as reliability,
     f.correctionDegree as degree
   FROM Feed f
   JOIN GeneralLodging gl ON f.lodgingIndex = gl.generalLodgingIndex
@@ -107,7 +107,7 @@ async function homeTestDao(region) {
   GROUP BY f.feedIndex
   UNION
   SELECT f.feedIndex, source, (SELECT '서울 에어비엔비') as name,
-    FORMAT(IF (AVG(r.degree), AVG(r.degree)*20, 0), 0) as reliability,
+    CAST(FORMAT(IF (AVG(r.degree), AVG(r.degree)*20, 0), 0) as unsigned) as reliability,
     f.correctionDegree as degree
   FROM Feed f
   JOIN Airbnb a ON f.lodgingIndex = a.airbnbIndex
@@ -133,7 +133,7 @@ async function homeTestDao(region) {
   const Query = `
   SELECT lodging.feedIndex, lodging.source, lodging.name, lodging.reliability, lodging.degree
   FROM ((SELECT f.feedIndex, source, gl.name as name,
-        FORMAT(IF (AVG(r.degree), AVG(r.degree)*20, 0), 0) as reliability,
+        CAST(FORMAT(IF (AVG(r.degree), AVG(r.degree)*20, 0), 0) as unsigned) as reliability,
         f.correctionDegree as degree, f.createdAt
   FROM Feed f
   JOIN GeneralLodging gl ON f.lodgingIndex = gl.generalLodgingIndex
@@ -143,7 +143,7 @@ async function homeTestDao(region) {
   GROUP BY f.feedIndex)
   UNION
   (SELECT f.feedIndex, source, (SELECT '서울 에어비엔비') as name,
-        FORMAT(IF (AVG(r.degree), AVG(r.degree)*20, 0), 0) as reliability,
+        CAST(FORMAT(IF (AVG(r.degree), AVG(r.degree)*20, 0), 0) as unsigned) as reliability,
         f.correctionDegree as degree, f.createdAt
   FROM Feed f
   JOIN Airbnb a ON f.lodgingIndex = a.airbnbIndex
