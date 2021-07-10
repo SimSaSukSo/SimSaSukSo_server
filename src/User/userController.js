@@ -24,9 +24,10 @@ const secret_config = require("../../config/secret");
     var email, nickname;
     
     if(!accessToken)
-        return res.send(errResponse(baseResponse.ACCESSTOKEN_EMPTY))
+        return res.send(errResponse(baseResponse.ACCESSTOKEN_EMPTY));
     
     try {
+        const loginAgainResult = response(baseResponse.LOGIN_SUCCESS);
         axios({
             url: api_url,
             method: 'get',
@@ -48,7 +49,36 @@ const secret_config = require("../../config/secret");
             console.log(userResult);
             // 이미 회원가입된 유저일 경우
             if(userResult) {
-                return res.json(errResponse(baseResponse.KAKAOUSER_REDUNDANT));
+                try {
+                    // 회원가입 시 토큰 생성
+                    let token = await jwt.sign(
+                        {
+                            kakaoId: kakaoId,
+                            nickname: nickname,
+                            email: email
+                        }, // 토큰의 내용(payload)
+                        secret_config.jwtsecret, // 비밀키
+                        {
+                            expiresIn: "365d",
+                            subject: "userInfo",
+                        } // 유효 기간 365일
+                    );
+
+                    // 토큰 생성 성공
+                    if (token) {
+                        const loginRes = {
+                            loginAgainResult,
+                            "token": token
+                        };
+
+                        return res.send(loginRes);
+                    }
+
+                } catch (err) {
+                    console.log(err)
+                    logger.error(`재로그인 중 Error`);
+                    return res.json(errResponse(baseResponse.SERVER_ERROR));
+                }
             }
 
             const result = await userService.kakaoCreateUser(nickname, kakaoId, avartarUrl, email);
@@ -95,7 +125,8 @@ const secret_config = require("../../config/secret");
             
             });
     } catch (err) {
-        logger.error(`카카오 소셜 로그인/회원가입 중 Error\n: ${JSON.stringify(err)}`);
+        console.log(err);
+        logger.error(`카카오 소셜 로그인/회원가입 중 Error`);
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 };
