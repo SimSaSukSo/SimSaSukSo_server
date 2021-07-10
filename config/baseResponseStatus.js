@@ -2,6 +2,7 @@ module.exports = {
 
     // Success
     SUCCESS : { "isSuccess": true, "code": 1000, "message":"성공" },
+    LOGIN_SUCCESS: { "isSuccess": true, "code": 1000, "message":"재로그인 성공" },
 
     // Common
     TOKEN_EMPTY : { "isSuccess": false, "code": 2000, "message":"JWT 토큰을 입력해주세요." },
