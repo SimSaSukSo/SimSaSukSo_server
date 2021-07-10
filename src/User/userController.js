@@ -66,12 +66,8 @@ const secret_config = require("../../config/secret");
 
                     // 토큰 생성 성공
                     if (token) {
-                        const loginRes = {
-                            loginAgainResult,
-                            "token": token
-                        };
-
-                        return res.send(loginRes);
+                        loginAgainResult.token = token;
+                        return res.send(loginAgainResult);
                     }
 
                 } catch (err) {
