@@ -84,7 +84,8 @@ const secret_config = require("../../config/secret");
             {
                 kakaoId: kakaoId,
                 nickname: nickname,
-                email: email
+                email: email,
+                userIndex: userIndex
             }, // 토큰의 내용(payload)
             secret_config.jwtsecret, // 비밀키
             {
