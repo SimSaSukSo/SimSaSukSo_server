@@ -9,7 +9,7 @@ const listDao = require('./listDao');
  * update : 2021.07.17.
  * desc : 찜 목록 제공 API
  */
-exports.index = async function (req, res) {
+exports.allList = async function (req, res) {
     const userIndex = req.verifiedToken.userIndex;
     let result = [];
     try {
@@ -40,6 +40,24 @@ exports.index = async function (req, res) {
         return res.send(response(baseResponse.SUCCESS, result));
     } catch (err) {
         logger.error(`찜 목록 제공 API Error\n: ${JSON.stringify(err)}`);
+        return res.json(errResponse(baseResponse.SERVER_ERROR));
+    }
+};
+
+/**
+ * update : 2021.07.17.
+ * desc : 찜 목록 생성 API
+ */
+ exports.newList = async function (req, res) {
+    const userIndex = req.verifiedToken.userIndex;
+    const title = req.body.title;
+    if (!title) return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+
+    try {
+        await listDao.createSavedList(userIndex, title);
+        return res.send(response(baseResponse.SUCCESS));
+    } catch (err) {
+        logger.error(`찜 목록 생성 API Error\n: ${JSON.stringify(err)}`);
         return res.json(errResponse(baseResponse.SERVER_ERROR));
     }
 };
