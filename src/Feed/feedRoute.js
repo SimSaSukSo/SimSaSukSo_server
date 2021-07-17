@@ -7,5 +7,5 @@ module.exports = function(app){
     app.get('/api/feeds/new', jwtMiddleware, feed.new);
 
     app.post('/api/feeds', jwtMiddleware, feed.uploadGeneralLodging);
-    // app.post('/api/feeds/airbnb', jwtMiddleware, feed.uploadAirbnb);
+    app.post('/api/feeds/airbnb', jwtMiddleware, feed.uploadAirbnb);
 };

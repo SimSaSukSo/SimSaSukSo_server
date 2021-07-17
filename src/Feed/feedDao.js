@@ -316,6 +316,51 @@ async function homeTestDao(region) {
   return rows;
 }
 
+/**
+ * update : 2021.07.17.
+ * desc : API 9 - 저장된 에어비앤비 확인
+ */
+ async function isSavedAirbnb(conn, url) {
+  const connection = conn;
+  const Query = `
+  SELECT airbnbIndex FROM Airbnb WHERE url = ?;
+  `;
+
+  const Params = [url];
+  const [rows] = await connection.query(Query, Params);
+  return rows;
+}
+
+/**
+ * update : 2021.07.17.
+ * desc : API 9 - 에어비앤비 추가
+ */
+ async function createAirbnb(conn, url, locationIndex) {
+  const connection = conn;
+  const Query = `
+  INSERT INTO Airbnb(url, locationIndex) VALUES (?, ?);
+  `;
+
+  const Params = [url, locationIndex];
+  const [rows] = await connection.query(Query, Params);
+  return rows;
+}
+
+/**
+ * update : 2021.07.17.
+ * desc : API 0 - 새로운 에어비앤비 피드 추가
+ */
+ async function createNewFeedByAirbnb(conn, userIndex, lodgingType, lodgingIndex, startDate, endDate, charge, correctionDegree, review, airbnbDesc) {
+  const connection = conn;
+  const Query = `
+  INSERT INTO Feed(userIndex, lodgingType, lodgingIndex, startDate, endDate, charge, correctionDegree, review, airbnbDesc)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+  `;
+  const Params = [userIndex, lodgingType, lodgingIndex, startDate, endDate, charge, correctionDegree, review, airbnbDesc];
+  const [rows] = await connection.query(Query, Params);
+
+  return rows;
+}
 
 module.exports = {
     homeTestDao,
@@ -333,4 +378,7 @@ module.exports = {
     isProsAndConsKeyword,
     createProsAndConsKeyword,
     createFeedProsAndCons,
+    isSavedAirbnb,
+    createAirbnb,
+    createNewFeedByAirbnb,
 };

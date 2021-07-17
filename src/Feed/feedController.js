@@ -331,3 +331,154 @@ exports.uploadGeneralLodging = async function (req, res) {
         connection.release();
     }
 }
+
+/**
+ * update : 2021.07.16.
+ * desc :에어비앤비 업로드 API
+ */
+ exports.uploadAirbnb = async function (req, res) {
+    const {
+        locationId, images, description, url, startDate, endDate, charge, correctionTool, correctionDegree,
+        review, tags, pros, cons
+    } = req.body;
+    const userIndex = req.verifiedToken.userIndex;
+    let airbnbIndex = 0;
+    let feedIndex = 0;
+
+    // 파라미터 있는지 확인
+    if (!locationId || !images || !description || !url || !startDate || !endDate || !charge || !correctionTool || !correctionDegree || !review) {
+        return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+    }
+
+    // locationId 유효한지 확인
+    let li = parseInt(locationId, 10);
+    if (Number.isNaN(li)) return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_INVALID));
+    else if (li < 1 || li > 172) res.json(errResponse(baseResponse.UPLOAD_PARAMETER_INVALID));
+
+    // 날짜 유효한지 확인
+    if (!date.isValidDate(startDate, endDate)) return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_INVALID));
+
+    // 가격 유효한지 확인
+    let ch = parseInt(charge, 10);
+    if (Number.isNaN(ch)) return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_INVALID));
+
+    // 보정정도 유효한지 확인
+    let cd = parseInt(correctionDegree, 10);
+    if (Number.isNaN(cd)) return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_INVALID));
+    else if (cd < 0 || cd > 5) return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_INVALID));
+
+    // 보정 도구 유효한지
+    correctionTool.forEach(element => {
+        if (element < 1 || element > 4) return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_INVALID));
+    });
+
+    const connection = await pool.getConnection(async (conn) => conn);
+    try {
+        await connection.beginTransaction();
+
+        // 저장된 숙소인지 확인
+        try {
+            const isSavedAirbnbRow = await feedDao.isSavedAirbnb(connection, url);
+    
+            if (isSavedAirbnbRow.length == 0) {
+                // 없으면 생성
+                const newAirbnbRows = await feedDao.createAirbnb(connection, url, locationId);
+                airbnbIndex = newAirbnbRows.insertId;
+            } else {
+                // 있으면 index 할당
+                airbnbIndex = isSavedAirbnbRow[0].airbnbIndex;
+            }
+        } catch (err) {
+            logger.error(`API 9 - 에어비앤비 조회 중 Error\n: ${JSON.stringify(err)}`);
+            return res.json(errResponse(baseResponse.DB_ERROR));
+        }
+        // 피드 생성
+        try {
+            const newFeedRow = await feedDao.createNewFeedByAirbnb(connection, userIndex, 2, airbnbIndex, startDate, endDate, charge, correctionDegree, review, description);
+            feedIndex = newFeedRow.insertId;
+        } catch(err) {
+            logger.error(`API 9 - 피드 생성 중 Error\n: ${JSON.stringify(err)}`);
+            return res.json(errResponse(baseResponse.DB_ERROR));
+        }
+        // 이미지 저장
+        try {
+            if (!(images == null || images == undefined)) {
+                for (let i=0; i<images.length; i++) {
+                    await feedDao.createFeedImage(connection, feedIndex, images[i], i+1);
+                }
+            }
+        } catch(err) {
+            logger.error(`API 9 - 이미지 추가 중 Error\n: ${JSON.stringify(err)}`);
+            return res.json(errResponse(baseResponse.DB_ERROR));
+        }
+        // 태그 조회 및 추가
+        try {
+            if (!(tags == null || tags == undefined)) {
+                for (let i=0; i<tags.length; i++) {
+                    const isHashTagRow = await feedDao.isHashTag(connection, tags[i]);
+                    let hashTagIndex = 0;
+                    if (isHashTagRow.length == 0) {
+                        // 없으면 새로 추가
+                        const newHashTagRows = await feedDao.createHashTag(connection, tags[i]);
+                        hashTagIndex = newHashTagRows.insertId;
+                    } else {
+                        hashTagIndex = isHashTagRow[0].hashTagIndex;
+                    }
+                    await feedDao.createFeedTag(connection, feedIndex, hashTagIndex);
+                }
+            }
+        } catch(err) {
+            logger.error(`API 9 - 태그 추가 중 Error\n: ${JSON.stringify(err)}`);
+            return res.json(errResponse(baseResponse.DB_ERROR));
+        }
+        // 장점 추가
+        try {
+            if (!(pros == null || pros == undefined)) {
+                for (let i=0; i<pros.length; i++) {
+                    const isProsAndConsRow = await feedDao.isProsAndConsKeyword(connection, pros[i]);
+                    let prosAndConsIndex = 0;
+                    if (isProsAndConsRow.length == 0) {
+                        // 없으면 새로 추가
+                        const newProsAndConskeywordRow = await feedDao.createProsAndConsKeyword(connection, pros[i]);
+                        prosAndConsIndex = newProsAndConskeywordRow.insertId;
+                    } else {
+                        prosAndConsIndex = isProsAndConsRow[0].hashTagIndex;
+                    }
+                    await feedDao.createFeedProsAndCons(conn, feedIndex, prosAndConsIndex, 'pros');
+                }
+            }
+        } catch(err) {
+            logger.error(`API 8 - 장점 추가 중 Error\n: ${JSON.stringify(err)}`);
+            return res.json(errResponse(baseResponse.DB_ERROR));
+        }
+        // 단점 추가
+        try {
+            if (!(cons == null || cons == undefined)) {
+                for (let i=0; i<cons.length; i++) {
+                    const isProsAndConsRow = await feedDao.isProsAndConsKeyword(connection, cons[i]);
+                    let prosAndConsIndex = 0;
+                    if (isProsAndConsRow.length == 0) {
+                        // 없으면 새로 추가
+                        const newProsAndConskeywordRow = await feedDao.createProsAndConsKeyword(connection, cons[i]);
+                        prosAndConsIndex = newProsAndConskeywordRow.insertId;
+                    } else {
+                        prosAndConsIndex = isProsAndConsRow[0].hashTagIndex;
+                    }
+                    await feedDao.createFeedProsAndCons(conn, feedIndex, prosAndConsIndex, 'cons');
+                }
+            }
+        } catch(err) {
+            logger.error(`API 9 - 장점 추가 중 Error\n: ${JSON.stringify(err)}`);
+            return res.json(errResponse(baseResponse.DB_ERROR));
+        }
+
+        // 성공
+        await connection.commit();
+        return res.send(response(baseResponse.SUCCESS));
+    } catch(err) {
+        logger.error(`API 9 Error\n: ${JSON.stringify(err)}`);
+        return res.json(errResponse(baseResponse.SERVER_ERROR));
+    } finally {
+        connection.release();
+    }
+}
