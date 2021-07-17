@@ -2,7 +2,7 @@ module.exports = {
 
     // Success
     SUCCESS : { "isSuccess": true, "code": 1000, "message":"성공" },
-    LOGIN_SUCCESS: { "isSuccess": true, "code": 1000, "message":"재로그인 성공" },
+    LOGIN_SUCCESS: { "isSuccess": true, "code": 1001, "message":"재로그인 성공" },
 
     // Common
     TOKEN_EMPTY : { "isSuccess": false, "code": 2000, "message":"JWT 토큰을 입력해주세요." },
@@ -38,6 +38,10 @@ module.exports = {
     USER_STATUS_EMPTY : { "isSuccess": false, "code": 2018, "message": "회원 상태값을 입력해주세요" },
 
     REGION_EMPTY : { "isSuccess": false, "code": 2030, "message": "지역을 입력해주세요." },
+
+    // related upload
+    UPLOAD_PARAMETER_EMPTY : { "isSuccess": false, "code": 2040, "message": "파리미터가 부족합니다." },
+    UPLOAD_PARAMETER_INVALID : { "isSuccess": false, "code": 2041, "message": "유효하지 않은 파라미터가 존재합니다." },
 
     // Response error
     SIGNUP_REDUNDANT_EMAIL : { "isSuccess": false, "code": 3001, "message":"중복된 이메일입니다." },
