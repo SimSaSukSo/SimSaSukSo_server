@@ -59,10 +59,26 @@ async function getSourceAtSavedList(savedListIndex) {
     return rows;
 }
 
+/**
+ * update : 2021.07.17.
+ * desc : 찜 목록 삭제
+ */
+ async function deleteSavedList(savedListIndex, userIndex) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const Query = `
+    UPDATE SavedList SET status = 'deleted' WHERE savedListIndex = ? AND userIndex = ?;
+    `;
+    const Params = [savedListIndex, userIndex];
+    const [rows] = await connection.query(Query, Params);
+    connection.release();
+
+    return rows;
+}
 
 module.exports = {
     getSavedList,
     getSourceAtSavedList,
     createSavedList,
     updateSavedList,
+    deleteSavedList,
 };

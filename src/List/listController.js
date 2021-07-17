@@ -107,3 +107,39 @@ exports.updateList = async function (req, res) {
         connection.release();
     }
 };
+
+/**
+ * update : 2021.07.17.
+ * desc : 찜 목록 삭제 API
+ */
+ exports.deleteList = async function (req, res) {
+    const userIndex = req.verifiedToken.userIndex;
+    let idx = req.params.idx;
+    const savedListIndex = parseInt(idx, 10);
+
+    if (!savedListIndex || Number.isNaN(savedListIndex)) return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_INVALID))
+
+    try {
+        try {
+            // 유저 찜 목록 조회
+            const userSavedListRow = await listDao.getSavedList(userIndex);
+            let userSavedList = [];
+            userSavedListRow.forEach(element => { userSavedList.push(element.savedListIndex); });
+            const userSavedListSet = new Set(userSavedList);
+
+            if (userSavedListSet.has(savedListIndex)) {
+                // 찜 목록 삭제
+                await listDao.deleteSavedList(savedListIndex, userIndex);
+                return res.send(response(baseResponse.SUCCESS));
+            } else {
+                return res.json(errResponse(baseResponse.SL_PARAMETER_INVALID));
+            }
+        } catch(err) {
+            logger.error(`찜 목록 삭제 DB Error\n: ${JSON.stringify(err)}`);
+            return res.json(errResponse(baseResponse.DB_ERROR));
+        }
+    } catch (err) {
+        logger.error(`찜 목록 삭제 API Error\n: ${JSON.stringify(err)}`);
+        return res.json(errResponse(baseResponse.SERVER_ERROR));
+    }
+};
