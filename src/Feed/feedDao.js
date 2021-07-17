@@ -161,10 +161,176 @@ async function homeTestDao(region) {
   return rows;
 }
 
+/**
+ * update : 2021.07.17.
+ * desc : API 8 - 저장된 숙소 유무 확인
+ */
+ async function isSavedGeneralLodging(conn, name, address) {
+  const connection = conn;
+  const Query = `
+  SELECT generalLodgingIndex
+  FROM GeneralLodging
+  WHERE name = ? AND address = ? ;
+  `;
+
+  const Params = [name, address];
+  const [rows] = await connection.query(Query, Params);
+  return rows;
+}
+
+/**
+ * update : 2021.07.17.
+ * desc : API 8 - 새로운 일반 숙소 추가
+ */
+ async function createNewGeneralLodging(conn, name, locationId, address) {
+  const connection = conn;
+  const Query = `
+  INSERT INTO GeneralLodging(name, locationIndex, address)
+  VALUES (?, ?, ?);
+  `;
+  const Params = [name, locationId, address];
+  const [rows] = await connection.query(Query, Params);
+
+  return rows;
+}
+
+/**
+ * update : 2021.07.17.
+ * desc : API 8 - 새로운 일반 숙소 피드 추가
+ */
+ async function createNewFeed(conn, userIndex, lodgingType, lodgingIndex, startDate, endDate, charge, correctionDegree, review) {
+  const connection = conn;
+  const Query = `
+  INSERT INTO Feed(userIndex, lodgingType, lodgingIndex, startDate, endDate, charge, correctionDegree, review)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+  `;
+  const Params = [userIndex, lodgingType, lodgingIndex, startDate, endDate, charge, correctionDegree, review];
+  const [rows] = await connection.query(Query, Params);
+
+  return rows;
+}
+
+/**
+ * update : 2021.07.17.
+ * desc : API 8 - 이미지 추가
+ */
+ async function createFeedImage(conn, feedIndex, source, uploadOrder) {
+  const connection = conn;
+  const Query = `
+  INSERT INTO FeedImage(feedIndex, source, uploadOrder)
+  VALUES (?, ?, ?);
+  `;
+  const Params = [feedIndex, source, uploadOrder];
+  const [rows] = await connection.query(Query, Params);
+
+  return rows;
+}
+
+/**
+ * update : 2021.07.17.
+ * desc : API 8 - 태그 조회
+ */
+ async function isHashTag(conn, keyword) {
+  const connection = conn;
+  const Query = `
+  SELECT hashTagIndex FROM HashTag WHERE keyword = ? AND status = 'normal';
+  `;
+  const Params = [keyword];
+  const [rows] = await connection.query(Query, Params);
+
+  return rows;
+}
+
+/**
+ * update : 2021.07.17.
+ * desc : API 8 - 해시 태그 추가
+ */
+ async function createHashTag(conn, keyword) {
+  const connection = conn;
+  const Query = `
+  INSERT INTO HashTag(keyword) VALUES (?);
+  `;
+  const Params = [keyword];
+  const [rows] = await connection.query(Query, Params);
+
+  return rows;
+}
+
+/**
+ * update : 2021.07.17.
+ * desc : API 8 - 피드 태그 추가
+ */
+ async function createFeedTag(conn, feedIndex, hashTagIndex) {
+  const connection = conn;
+  const Query = `
+  INSERT INTO FeedTag(feedIndex, hashTagIndex) VALUES (?, ?);
+  `;
+  const Params = [feedIndex, hashTagIndex];
+  const [rows] = await connection.query(Query, Params);
+
+  return rows;
+}
+
+/**
+ * update : 2021.07.17.
+ * desc : API 8 - 장단점 키워드 조회
+ */
+ async function isProsAndConsKeyword(conn, keyword) {
+  const connection = conn;
+  const Query = `
+  SELECT lodgingProsAndConsIndex FROM LodgingProsAndCons WHERE keyword = ? AND status = 'normal';
+  `;
+  const Params = [keyword];
+  const [rows] = await connection.query(Query, Params);
+
+  return rows;
+}
+
+/**
+ * update : 2021.07.17.
+ * desc : API 8 - 장단점 키워드 추가
+ */
+ async function createProsAndConsKeyword(conn, keyword) {
+  const connection = conn;
+  const Query = `
+  INSERT INTO LodgingProsAndCons(keyword) VALUES (?);
+  `;
+  const Params = [keyword];
+  const [rows] = await connection.query(Query, Params);
+
+  return rows;
+}
+
+/**
+ * update : 2021.07.17.
+ * desc : API 8 - 피드 장단점 추가
+ */
+ async function createFeedProsAndCons(conn, feedIndex, lodgingProsAndConsIndex, status) {
+  const connection = conn;
+  const Query = `
+  INSERT INTO FeedProsAndCons(feedIndex, lodgingProsAndConsIndex, status) VALUES (?, ?, ?);
+  `;
+  const Params = [feedIndex, lodgingProsAndConsIndex, status];
+  const [rows] = await connection.query(Query, Params);
+
+  return rows;
+}
+
+
 module.exports = {
     homeTestDao,
     homeTestWithTagDao,
     hotFeedHotHashTagTest,
     hotFeedTest,
     newFeedTest,
+    isSavedGeneralLodging,
+    createNewGeneralLodging,
+    createNewFeed,
+    createFeedImage,
+    isHashTag,
+    createHashTag,
+    createFeedTag,
+    isProsAndConsKeyword,
+    createProsAndConsKeyword,
+    createFeedProsAndCons,
 };
