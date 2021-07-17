@@ -293,7 +293,7 @@ exports.uploadGeneralLodging = async function (req, res) {
                     } else {
                         prosAndConsIndex = isProsAndConsRow[0].hashTagIndex;
                     }
-                    await feedDao.createFeedProsAndCons(conn, feedIndex, prosAndConsIndex, 'pros');
+                    await feedDao.createFeedProsAndCons(connection, feedIndex, prosAndConsIndex, 'pros');
                 }
             }
         } catch(err) {
@@ -313,7 +313,7 @@ exports.uploadGeneralLodging = async function (req, res) {
                     } else {
                         prosAndConsIndex = isProsAndConsRow[0].hashTagIndex;
                     }
-                    await feedDao.createFeedProsAndCons(conn, feedIndex, prosAndConsIndex, 'cons');
+                    await feedDao.createFeedProsAndCons(connection, feedIndex, prosAndConsIndex, 'cons');
                 }
             }
         } catch(err) {
@@ -444,7 +444,7 @@ exports.uploadGeneralLodging = async function (req, res) {
                     } else {
                         prosAndConsIndex = isProsAndConsRow[0].hashTagIndex;
                     }
-                    await feedDao.createFeedProsAndCons(conn, feedIndex, prosAndConsIndex, 'pros');
+                    await feedDao.createFeedProsAndCons(connection, feedIndex, prosAndConsIndex, 'pros');
                 }
             }
         } catch(err) {
@@ -464,7 +464,7 @@ exports.uploadGeneralLodging = async function (req, res) {
                     } else {
                         prosAndConsIndex = isProsAndConsRow[0].hashTagIndex;
                     }
-                    await feedDao.createFeedProsAndCons(conn, feedIndex, prosAndConsIndex, 'cons');
+                    await feedDao.createFeedProsAndCons(connection, feedIndex, prosAndConsIndex, 'cons');
                 }
             }
         } catch(err) {
