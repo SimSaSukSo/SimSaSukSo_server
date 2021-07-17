@@ -4,7 +4,7 @@ module.exports = function(app){
 
     app.get('/api/lists', jwtMiddleware, list.allList);
     app.post('/api/lists', jwtMiddleware, list.newList);
-    // app.put('/api/lists', jwtMiddleware, list.updateList);
+    app.put('/api/lists', jwtMiddleware, list.updateList);
     // app.delete('/api/lists', jwtMiddleware, list.deleteList);
     // app.get('/api/lists/:idx', jwtMiddleware, list.feedInList);
 };

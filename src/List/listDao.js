@@ -45,9 +45,24 @@ async function getSourceAtSavedList(savedListIndex) {
     return rows;
 }
 
+/**
+ * update : 2021.07.17.
+ * desc : 찜 목록 수정
+ */
+ async function updateSavedList(conn, savedListIndex, title, userIndex) {
+    const connection = conn;
+    const Query = `
+    UPDATE SavedList SET title = ? WHERE savedListIndex = ? AND userIndex = ?;
+    `;
+    const Params = [title, savedListIndex, userIndex];
+    const [rows] = await connection.query(Query, Params);
+    return rows;
+}
+
 
 module.exports = {
     getSavedList,
     getSourceAtSavedList,
     createSavedList,
+    updateSavedList,
 };

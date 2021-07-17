@@ -43,6 +43,9 @@ module.exports = {
     UPLOAD_PARAMETER_EMPTY : { "isSuccess": false, "code": 2040, "message": "파리미터가 부족합니다." },
     UPLOAD_PARAMETER_INVALID : { "isSuccess": false, "code": 2041, "message": "유효하지 않은 파라미터가 존재합니다." },
 
+    // related saved list
+    SL_PARAMETER_INVALID : { "isSuccess": false, "code": 2050, "message": "존재하지 않는 찜목록입니다." },
+
     // Response error
     SIGNUP_REDUNDANT_EMAIL : { "isSuccess": false, "code": 3001, "message":"중복된 이메일입니다." },
     SIGNUP_REDUNDANT_NICKNAME : { "isSuccess": false, "code": 3002, "message":"중복된 닉네임입니다." },
