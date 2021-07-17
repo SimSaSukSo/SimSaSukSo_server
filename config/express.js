@@ -20,6 +20,7 @@ module.exports = function () {
     require('../src/User/userRoute')(app);
     require('../src/Feed/feedRoute')(app);
     require('../src/FeedView/feedViewRoute')(app);
+    require('../src/List/listRoute')(app);
 
     return app;
 };
