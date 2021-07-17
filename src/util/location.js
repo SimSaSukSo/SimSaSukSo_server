@@ -18,3 +18,43 @@ exports.getLocationIdByAddress = async (address) => {
     else if (await address.includes("충북")) return 1015;
     else 1016; // 지역에 포함 안되는 경우 이후 수정 필요
 }
+
+// locationId로 지역명 추출
+exports.getRegionNameByLocationId = (locationId) => {
+    if (locationId == 1000) return "서울";
+    else if (locationId == 1001) return "부산";
+    else if (locationId == 1002) return "제주";
+    else if (locationId == 1003) return "강원";
+    else if (locationId == 1004) return "경기";
+    else if (locationId == 1005) return "인천";
+    else if (locationId == 1006) return "대구";
+    else if (locationId == 1007) return "울산";
+    else if (locationId == 1008) return "경남";
+    else if (locationId == 1009) return "경북";
+    else if (locationId == 1010) return "광주";
+    else if (locationId == 1011) return "전남";
+    else if (locationId == 1012) return "전북";
+    else if (locationId == 1013) return "대전";
+    else if (locationId == 1014) return "충남";
+    else return "충북";
+}
+
+// locationId로 지역별 locationIndex 범위 추출;
+exports.getLocationRangeByLocationId = (locationId) => {
+    if (locationId == 1000) return [1, 22];
+    else if (locationId == 1001) return [23, 37];
+    else if (locationId == 1002) return [38, 44];
+    else if (locationId == 1003) return [45, 55];
+    else if (locationId == 1004) return [56, 77];
+    else if (locationId == 1005) return [78, 88];
+    else if (locationId == 1006) return [89, 96];
+    else if (locationId == 1007) return [97, 98];
+    else if (locationId == 1008) return [99, 110];
+    else if (locationId == 1009) return [111, 123];
+    else if (locationId == 1010) return [124, 127];
+    else if (locationId == 1011) return [128, 140];
+    else if (locationId == 1012) return [141, 148];
+    else if (locationId == 1013) return [149, 152];
+    else if (locationId == 1014) return [153, 165];
+    else return [166, 172];
+}

@@ -32,55 +32,24 @@ async function homeTestDao(region) {
  * desc : [Dummy] 홈 화면 - 신뢰도 높은 게시글 
  */
  async function homeTestWithTagDao() {
-    const connection = await pool.getConnection(async (conn) => conn);
-    const Query = `
-    SELECT lodging.feedIndex, lodging.source, lodging.name, GROUP_CONCAT(ht.keyword SEPARATOR ',') as tags
-    FROM (SELECT f.feedIndex, source, gl.name as name
-    FROM Feed f
-    JOIN GeneralLodging gl ON f.lodgingIndex = gl.generalLodgingIndex
-    JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
-    WHERE f.lodgingType = 1 AND fi.uploadOrder = 1
-    UNION
-    SELECT f.feedIndex, source, (SELECT '서울 에어비엔비') as name
-    FROM Feed f
-    JOIN Airbnb a ON f.lodgingIndex = a.airbnbIndex
-    JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
-    WHERE f.lodgingType = 2 AND fi.uploadOrder = 1) as lodging
-    JOIN FeedTag ft ON lodging.feedIndex = ft.feedIndex
-    JOIN HashTag ht ON ft.hashTagIndex = ht.hashTagIndex
-    GROUP BY lodging.feedIndex
-    LIMIT 3;
-    `;
-  
-    const [rows] = await connection.query(Query)
-    connection.release();
-  
-    return rows;
-  }
-
-/**
- * update : 2021.06.30.
- * desc : [Dummy] 인기 피드 제공 - 인기해시태그
- */
- async function hotFeedHotHashTagTest() {
   const connection = await pool.getConnection(async (conn) => conn);
   const Query = `
-  SELECT DISTINCT ht.keyword, lodging.source
-  FROM HashTag ht
-  JOIN FeedTag ft ON ht.hashTagIndex = ft.hashTagIndex
-  JOIN (SELECT f.feedIndex, source
+  SELECT lodging.feedIndex, lodging.source, lodging.name, GROUP_CONCAT(ht.keyword SEPARATOR ',') as tags
+  FROM (SELECT f.feedIndex, source, gl.name as name
   FROM Feed f
   JOIN GeneralLodging gl ON f.lodgingIndex = gl.generalLodgingIndex
   JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
   WHERE f.lodgingType = 1 AND fi.uploadOrder = 1
   UNION
-  SELECT f.feedIndex, source
+  SELECT f.feedIndex, source, (SELECT '서울 에어비엔비') as name
   FROM Feed f
   JOIN Airbnb a ON f.lodgingIndex = a.airbnbIndex
   JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
-  WHERE f.lodgingType = 2 AND fi.uploadOrder = 1) as lodging ON ft.feedIndex = lodging.feedIndex
-  GROUP BY ht.keyword
-  LIMIT 10;
+  WHERE f.lodgingType = 2 AND fi.uploadOrder = 1) as lodging
+  JOIN FeedTag ft ON lodging.feedIndex = ft.feedIndex
+  JOIN HashTag ht ON ft.hashTagIndex = ht.hashTagIndex
+  GROUP BY lodging.feedIndex
+  LIMIT 3;
   `;
 
   const [rows] = await connection.query(Query)
@@ -90,72 +59,243 @@ async function homeTestDao(region) {
 }
 
 /**
- * update : 2021.06.30.
- * desc : [Dummy] 인기 피드 제공
+* update : 2021.06.30.
+* desc : [Dummy] 인기 피드 제공 - 인기해시태그
+*/
+async function hotFeedHotHashTagTest() {
+const connection = await pool.getConnection(async (conn) => conn);
+const Query = `
+SELECT DISTINCT ht.keyword, lodging.source
+FROM HashTag ht
+JOIN FeedTag ft ON ht.hashTagIndex = ft.hashTagIndex
+JOIN (SELECT f.feedIndex, source
+FROM Feed f
+JOIN GeneralLodging gl ON f.lodgingIndex = gl.generalLodgingIndex
+JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
+WHERE f.lodgingType = 1 AND fi.uploadOrder = 1
+UNION
+SELECT f.feedIndex, source
+FROM Feed f
+JOIN Airbnb a ON f.lodgingIndex = a.airbnbIndex
+JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
+WHERE f.lodgingType = 2 AND fi.uploadOrder = 1) as lodging ON ft.feedIndex = lodging.feedIndex
+GROUP BY ht.keyword
+LIMIT 10;
+`;
+
+const [rows] = await connection.query(Query)
+connection.release();
+
+return rows;
+}
+
+/**
+* update : 2021.06.30.
+* desc : [Dummy] 인기 피드 제공
+*/
+async function hotFeedTest(offset) {
+const connection = await pool.getConnection(async (conn) => conn);
+const Query = `
+SELECT f.feedIndex, source, gl.name as name,
+  CAST(FORMAT(IF (AVG(r.degree), AVG(r.degree)*20, 0), 0) as unsigned) as reliability,
+  f.correctionDegree as degree
+FROM Feed f
+JOIN GeneralLodging gl ON f.lodgingIndex = gl.generalLodgingIndex
+JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
+LEFT JOIN Reliability r ON f.feedIndex = r.feedIndex
+WHERE f.lodgingType = 1 AND fi.uploadOrder = 1
+GROUP BY f.feedIndex
+UNION
+SELECT f.feedIndex, source, (SELECT '서울 에어비엔비') as name,
+  CAST(FORMAT(IF (AVG(r.degree), AVG(r.degree)*20, 0), 0) as unsigned) as reliability,
+  f.correctionDegree as degree
+FROM Feed f
+JOIN Airbnb a ON f.lodgingIndex = a.airbnbIndex
+JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
+LEFT JOIN Reliability r ON f.feedIndex = r.feedIndex
+WHERE f.lodgingType = 2 AND fi.uploadOrder = 1
+GROUP BY f.feedIndex
+LIMIT 24 OFFSET ${offset};
+`;
+
+const [rows] = await connection.query(Query)
+connection.release();
+
+return rows;
+}
+
+/**
+* update : 2021.06.30.
+* desc : [Dummy] 최신 피드 제공
+*/
+async function newFeedTest(offset) {
+const connection = await pool.getConnection(async (conn) => conn);
+const Query = `
+SELECT lodging.feedIndex, lodging.source, lodging.name, lodging.reliability, lodging.degree
+FROM ((SELECT f.feedIndex, source, gl.name as name,
+      CAST(FORMAT(IF (AVG(r.degree), AVG(r.degree)*20, 0), 0) as unsigned) as reliability,
+      f.correctionDegree as degree, f.createdAt
+FROM Feed f
+JOIN GeneralLodging gl ON f.lodgingIndex = gl.generalLodgingIndex
+JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
+LEFT JOIN Reliability r ON f.feedIndex = r.feedIndex
+WHERE f.lodgingType = 1 AND fi.uploadOrder = 1
+GROUP BY f.feedIndex)
+UNION
+(SELECT f.feedIndex, source, (SELECT '서울 에어비엔비') as name,
+      CAST(FORMAT(IF (AVG(r.degree), AVG(r.degree)*20, 0), 0) as unsigned) as reliability,
+      f.correctionDegree as degree, f.createdAt
+FROM Feed f
+JOIN Airbnb a ON f.lodgingIndex = a.airbnbIndex
+JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
+LEFT JOIN Reliability r ON f.feedIndex = r.feedIndex
+WHERE f.lodgingType = 2 AND fi.uploadOrder = 1
+GROUP BY f.feedIndex)) as lodging
+ORDER BY lodging.createdAt DESC
+LIMIT 24 OFFSET ${offset};
+`;
+
+const [rows] = await connection.query(Query)
+connection.release();
+
+return rows;
+}
+
+/**
+ * update : 2021.07.17.
+ * desc : 홈 화면 제공 - 요즘 대세 호텔
  */
- async function hotFeedTest(offset) {
+ async function getHotFive() {
   const connection = await pool.getConnection(async (conn) => conn);
   const Query = `
-  SELECT f.feedIndex, source, gl.name as name,
-    CAST(FORMAT(IF (AVG(r.degree), AVG(r.degree)*20, 0), 0) as unsigned) as reliability,
-    f.correctionDegree as degree
+  SELECT rl.feedIndex, rl.source, rl.name
+  FROM (
+  (SELECT f.feedIndex, source, gl.name as name
   FROM Feed f
   JOIN GeneralLodging gl ON f.lodgingIndex = gl.generalLodgingIndex
   JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
-  LEFT JOIN Reliability r ON f.feedIndex = r.feedIndex
-  WHERE f.lodgingType = 1 AND fi.uploadOrder = 1
-  GROUP BY f.feedIndex
+  WHERE f.lodgingType = 1 AND fi.uploadOrder = 1)
   UNION
-  SELECT f.feedIndex, source, (SELECT '서울 에어비엔비') as name,
-    CAST(FORMAT(IF (AVG(r.degree), AVG(r.degree)*20, 0), 0) as unsigned) as reliability,
-    f.correctionDegree as degree
+  (SELECT f.feedIndex, source, (SELECT CONCAT(l.state,' 에어비엔비')) as name
   FROM Feed f
   JOIN Airbnb a ON f.lodgingIndex = a.airbnbIndex
   JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
-  LEFT JOIN Reliability r ON f.feedIndex = r.feedIndex
-  WHERE f.lodgingType = 2 AND fi.uploadOrder = 1
-  GROUP BY f.feedIndex
-  LIMIT 24 OFFSET ${offset};
+  JOIN Location l ON a.locationIndex = l.locationIndex
+  WHERE f.lodgingType = 2 AND fi.uploadOrder = 1)
+  ) rl
+  LEFT OUTER JOIN (
+      SELECT fl.feedIndex, COUNT(fl.feedIndex) as cnt
+      FROM FeedLike fl
+      GROUP BY fl.feedIndex, status HAVING fl.status = 'like'
+  ) likeFl ON rl.feedIndex = likeFl.feedIndex
+  ORDER BY likeFl.cnt
+  LIMIT 5;
   `;
-
-  const [rows] = await connection.query(Query)
+  const [rows] = await connection.query(Query);
   connection.release();
 
   return rows;
 }
 
 /**
- * update : 2021.06.30.
- * desc : [Dummy] 최신 피드 제공
+ * update : 2021.07.17.
+ * desc : 홈 화면 제공 - 지역 TOP 5
  */
- async function newFeedTest(offset) {
+ async function getRegionHotFive(locationId, locationRange) {
   const connection = await pool.getConnection(async (conn) => conn);
   const Query = `
-  SELECT lodging.feedIndex, lodging.source, lodging.name, lodging.reliability, lodging.degree
-  FROM ((SELECT f.feedIndex, source, gl.name as name,
-        CAST(FORMAT(IF (AVG(r.degree), AVG(r.degree)*20, 0), 0) as unsigned) as reliability,
-        f.correctionDegree as degree, f.createdAt
+  SELECT rl.feedIndex, rl.source, rl.name
+  FROM (
+  (SELECT f.feedIndex, source, gl.name as name
   FROM Feed f
   JOIN GeneralLodging gl ON f.lodgingIndex = gl.generalLodgingIndex
   JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
-  LEFT JOIN Reliability r ON f.feedIndex = r.feedIndex
-  WHERE f.lodgingType = 1 AND fi.uploadOrder = 1
-  GROUP BY f.feedIndex)
+  WHERE f.lodgingType = 1 AND fi.uploadOrder = 1 AND (gl.locationIndex = ? || (gl.locationIndex >= ? AND gl.locationIndex <= ?)))
   UNION
-  (SELECT f.feedIndex, source, (SELECT '서울 에어비엔비') as name,
-        CAST(FORMAT(IF (AVG(r.degree), AVG(r.degree)*20, 0), 0) as unsigned) as reliability,
-        f.correctionDegree as degree, f.createdAt
+  (SELECT f.feedIndex, source, (SELECT CONCAT(l.state,' 에어비엔비')) as name
   FROM Feed f
   JOIN Airbnb a ON f.lodgingIndex = a.airbnbIndex
   JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
-  LEFT JOIN Reliability r ON f.feedIndex = r.feedIndex
-  WHERE f.lodgingType = 2 AND fi.uploadOrder = 1
-  GROUP BY f.feedIndex)) as lodging
-  ORDER BY lodging.createdAt DESC
-  LIMIT 24 OFFSET ${offset};
+  JOIN Location l ON a.locationIndex = l.locationIndex
+  WHERE f.lodgingType = 2 AND fi.uploadOrder = 1 AND (a.locationIndex = ? || (a.locationIndex >= ? AND a.locationIndex <= ?)))
+  ) rl
+  LEFT OUTER JOIN (
+      SELECT fl.feedIndex, COUNT(fl.feedIndex) as cnt
+      FROM FeedLike fl
+      GROUP BY fl.feedIndex, status HAVING fl.status = 'like'
+  ) likeFl ON rl.feedIndex = likeFl.feedIndex
+  ORDER BY likeFl.cnt
+  LIMIT 5;
   `;
+  const Params = [locationId, locationRange[0], locationRange[1], locationId, locationRange[0], locationRange[1]];
+  const [rows] = await connection.query(Query, Params);
+  connection.release();
 
-  const [rows] = await connection.query(Query)
+  return rows;
+}
+
+/**
+ * update : 2021.07.17.
+ * desc : 홈 화면 제공 - 급상승 숙소
+ */
+ async function getTrend() {
+  const connection = await pool.getConnection(async (conn) => conn);
+  const Query = `
+  SELECT rl.feedIndex, rl.source, rl.name
+  FROM (
+  (SELECT f.feedIndex, source, gl.name as name
+  FROM Feed f
+  JOIN GeneralLodging gl ON f.lodgingIndex = gl.generalLodgingIndex
+  JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
+  WHERE f.lodgingType = 1 AND fi.uploadOrder = 1)
+  UNION
+  (SELECT f.feedIndex, source, (SELECT CONCAT(l.state,' 에어비엔비')) as name
+  FROM Feed f
+  JOIN Airbnb a ON f.lodgingIndex = a.airbnbIndex
+  JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
+  JOIN Location l ON a.locationIndex = l.locationIndex
+  WHERE f.lodgingType = 2 AND fi.uploadOrder = 1)
+  ) rl
+  LEFT OUTER JOIN (
+      SELECT fl.feedIndex, COUNT(fl.feedIndex) as cnt
+      FROM FeedLike fl
+      GROUP BY fl.feedIndex
+  ) likeFl ON rl.feedIndex = likeFl.feedIndex
+  ORDER BY likeFl.cnt
+  LIMIT 5;
+  `;
+  const [rows] = await connection.query(Query);
+  connection.release();
+
+  return rows;
+}
+
+/**
+ * update : 2021.07.17.
+ * desc : [DUMMY] 홈 화면 제공 - 신뢰도 높은 숙소
+ */
+ async function getbelievePlaces() {
+  const connection = await pool.getConnection(async (conn) => conn);
+  const Query = `
+  SELECT lodging.feedIndex, lodging.source, lodging.name, GROUP_CONCAT(ht.keyword SEPARATOR ',') as tags
+  FROM (SELECT f.feedIndex, source, gl.name as name
+  FROM Feed f
+  JOIN GeneralLodging gl ON f.lodgingIndex = gl.generalLodgingIndex
+  JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
+  WHERE f.lodgingType = 1 AND fi.uploadOrder = 1
+  UNION
+  SELECT f.feedIndex, source, (SELECT CONCAT(l.state,' 에어비엔비')) as name
+  FROM Feed f
+  JOIN Airbnb a ON f.lodgingIndex = a.airbnbIndex
+  JOIN FeedImage fi ON f.feedIndex = fi.feedIndex
+  JOIN Location l ON a.locationIndex = l.locationIndex
+  WHERE f.lodgingType = 2 AND fi.uploadOrder = 1) as lodging
+  JOIN FeedTag ft ON lodging.feedIndex = ft.feedIndex
+  JOIN HashTag ht ON ft.hashTagIndex = ht.hashTagIndex
+  GROUP BY lodging.feedIndex
+  LIMIT 3;
+  `;
+  const [rows] = await connection.query(Query);
   connection.release();
 
   return rows;
@@ -348,7 +488,7 @@ async function homeTestDao(region) {
 
 /**
  * update : 2021.07.17.
- * desc : API 0 - 새로운 에어비앤비 피드 추가
+ * desc : API 9 - 새로운 에어비앤비 피드 추가
  */
  async function createNewFeedByAirbnb(conn, userIndex, lodgingType, lodgingIndex, startDate, endDate, charge, correctionDegree, review, airbnbDesc) {
   const connection = conn;
@@ -381,4 +521,8 @@ module.exports = {
     isSavedAirbnb,
     createAirbnb,
     createNewFeedByAirbnb,
+    getRegionHotFive,
+    getHotFive,
+    getTrend,
+    getbelievePlaces,
 };
