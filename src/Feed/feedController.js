@@ -251,8 +251,10 @@ exports.uploadGeneralLodging = async function (req, res) {
         }
         // 이미지 저장
         try {
-            for (let i=0; i<images.length; i++) {
-                await feedDao.createFeedImage(connection, feedIndex, images[i], i+1);
+            if (!(images == null || images == undefined)) {
+                for (let i=0; i<images.length; i++) {
+                    await feedDao.createFeedImage(connection, feedIndex, images[i], i+1);
+                }
             }
         } catch(err) {
             logger.error(`API 8 - 이미지 추가 중 Error\n: ${JSON.stringify(err)}`);
@@ -264,7 +266,7 @@ exports.uploadGeneralLodging = async function (req, res) {
                 for (let i=0; i<tags.length; i++) {
                     const isHashTagRow = await feedDao.isHashTag(connection, tags[i]);
                     let hashTagIndex = 0;
-                    if (isHashTagRow == 0) {
+                    if (isHashTagRow.length == 0) {
                         // 없으면 새로 추가
                         const newHashTagRows = await feedDao.createHashTag(connection, tags[i]);
                         hashTagIndex = newHashTagRows.insertId;
@@ -284,7 +286,7 @@ exports.uploadGeneralLodging = async function (req, res) {
                 for (let i=0; i<pros.length; i++) {
                     const isProsAndConsRow = await feedDao.isProsAndConsKeyword(connection, pros[i]);
                     let prosAndConsIndex = 0;
-                    if (isProsAndConsRow == 0) {
+                    if (isProsAndConsRow.length == 0) {
                         // 없으면 새로 추가
                         const newProsAndConskeywordRow = await feedDao.createProsAndConsKeyword(connection, pros[i]);
                         prosAndConsIndex = newProsAndConskeywordRow.insertId;
@@ -304,7 +306,7 @@ exports.uploadGeneralLodging = async function (req, res) {
                 for (let i=0; i<cons.length; i++) {
                     const isProsAndConsRow = await feedDao.isProsAndConsKeyword(connection, cons[i]);
                     let prosAndConsIndex = 0;
-                    if (isProsAndConsRow == 0) {
+                    if (isProsAndConsRow.length == 0) {
                         // 없으면 새로 추가
                         const newProsAndConskeywordRow = await feedDao.createProsAndConsKeyword(connection, cons[i]);
                         prosAndConsIndex = newProsAndConskeywordRow.insertId;
