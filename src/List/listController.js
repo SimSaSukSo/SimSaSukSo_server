@@ -143,3 +143,40 @@ exports.updateList = async function (req, res) {
         return res.json(errResponse(baseResponse.SERVER_ERROR));
     }
 };
+
+/**
+ * update : 2021.07.19.
+ * desc : 특정 찜 목록 조회 API
+ */
+ exports.feedsInSavedList = async function (req, res) {
+    const userIndex = req.verifiedToken.userIndex;
+    let idx = req.params.idx;
+    const savedListIndex = parseInt(idx, 10);
+    let title;
+
+    if (!savedListIndex || Number.isNaN(savedListIndex)) return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_INVALID))
+
+    try {
+        try {
+            // 유저 찜 목록 조회
+            const userSavedListRow = await listDao.getTitleOfSavedList(userIndex, savedListIndex);
+
+            if (userSavedListRow.length != 0) {
+                // 특정 찜 목록 조회
+                title = userSavedListRow[0].title;
+                const feeds = await listDao.getFeedsOfSavedList(savedListIndex);
+                console.log(feeds);
+                const result = { title, feeds };
+                return res.send(response(baseResponse.SUCCESS, result));
+            } else {
+                return res.json(errResponse(baseResponse.SL_PARAMETER_INVALID));
+            }
+        } catch(err) {
+            logger.error(`특정 찜 목록 조회 DB Error\n: ${JSON.stringify(err)}`);
+            return res.json(errResponse(baseResponse.DB_ERROR));
+        }
+    } catch (err) {
+        logger.error(`특정 찜 목록 조회 API Error\n: ${JSON.stringify(err)}`);
+        return res.json(errResponse(baseResponse.SERVER_ERROR));
+    }
+};

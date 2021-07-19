@@ -75,10 +75,47 @@ async function getSourceAtSavedList(savedListIndex) {
     return rows;
 }
 
+/**
+ * update : 2021.07.19.
+ * desc : 특정 찜 목록 조회 - title
+ */
+ async function getTitleOfSavedList(userIndex, savedListIndex) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const Query = `
+    SELECT title FROM SavedList WHERE userIndex = ? AND status = 'normal' AND savedListIndex = ?;
+    `;
+    const Params = [userIndex, savedListIndex];
+    const [rows] = await connection.query(Query, Params);
+    connection.release();
+  
+    return rows;
+}
+/**
+ * update : 2021.07.19.
+ * desc : 특정 찜 목록 조회 - feeds
+ */
+ async function getFeedsOfSavedList(savedListIndex) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const Query = `
+    SELECT sf.feedIndex, fi.source
+    FROM SavedFeed sf
+    JOIN FeedImage fi ON sf.feedIndex = fi.feedIndex
+    WHERE sf.savedListIndex = ? AND fi.uploadOrder = 1 AND sf.status = 'normal'
+    ORDER BY sf.createdAt DESC;
+    `;
+    const Params = [savedListIndex];
+    const [rows] = await connection.query(Query, Params);
+    connection.release();
+  
+    return rows;
+}
+
 module.exports = {
     getSavedList,
     getSourceAtSavedList,
     createSavedList,
     updateSavedList,
     deleteSavedList,
+    getTitleOfSavedList,
+    getFeedsOfSavedList,
 };
