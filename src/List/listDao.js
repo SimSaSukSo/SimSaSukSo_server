@@ -94,14 +94,15 @@ async function getSourceAtSavedList(savedListIndex) {
  * update : 2021.07.19.
  * desc : 특정 찜 목록 조회 - feeds
  */
- async function getFeedsOfSavedList(savedListIndex) {
+ async function getFeedsOfSavedList(savedListIndex, offset) {
     const connection = await pool.getConnection(async (conn) => conn);
     const Query = `
     SELECT sf.feedIndex, fi.source
     FROM SavedFeed sf
     JOIN FeedImage fi ON sf.feedIndex = fi.feedIndex
     WHERE sf.savedListIndex = ? AND fi.uploadOrder = 1 AND sf.status = 'normal'
-    ORDER BY sf.createdAt DESC;
+    ORDER BY sf.createdAt DESC
+    LIMIT 24 OFFSET ${offset};
     `;
     const Params = [savedListIndex];
     const [rows] = await connection.query(Query, Params);

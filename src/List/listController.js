@@ -4,6 +4,7 @@ const baseResponse = require("../../config/baseResponseStatus");
 const {response, errResponse} = require("../../config/response");
 
 const listDao = require('./listDao');
+const feedPerPage = 24;
 
 /**
  * update : 2021.07.17.
@@ -154,6 +155,13 @@ exports.updateList = async function (req, res) {
     const savedListIndex = parseInt(idx, 10);
     let title;
 
+    // 페이지 유효성 검사
+    let page = req.query.page;
+
+    if (!page) page = 1;
+    page = parseInt(page, 10);
+    if (Number.isNaN(page)) return res.json(errResponse(baseResponse.PAGE_WRONG));
+    
     if (!savedListIndex || Number.isNaN(savedListIndex)) return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_INVALID))
 
     try {
@@ -164,8 +172,7 @@ exports.updateList = async function (req, res) {
             if (userSavedListRow.length != 0) {
                 // 특정 찜 목록 조회
                 title = userSavedListRow[0].title;
-                const feeds = await listDao.getFeedsOfSavedList(savedListIndex);
-                console.log(feeds);
+                const feeds = await listDao.getFeedsOfSavedList(savedListIndex, (page-1) * feedPerPage);
                 const result = { title, feeds };
                 return res.send(response(baseResponse.SUCCESS, result));
             } else {
