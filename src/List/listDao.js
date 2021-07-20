@@ -7,7 +7,7 @@ const { pool } = require("../../config/database");
 async function getSavedList(userIndex) {
     const connection = await pool.getConnection(async (conn) => conn);
     const Query = `
-    SELECT savedListIndex, title FROM SavedList WHERE userIndex = ? AND status = 'normal';
+    SELECT savedListIndex, title FROM SavedList WHERE userIndex = ? AND status = 'normal' AND status = 'normal';
     `;
     const Params = [userIndex];
     const [rows] = await connection.query(Query, Params);
@@ -21,7 +21,8 @@ async function getSourceAtSavedList(savedListIndex) {
     SELECT fi.source
     FROM SavedFeed sf
     JOIN FeedImage fi ON sf.feedIndex = fi.feedIndex
-    WHERE sf.savedListIndex = ? AND fi.uploadOrder = 1 LIMIT 4;
+    WHERE sf.savedListIndex = ? AND fi.uploadOrder = 1 AND sf.status = 'normal'
+    LIMIT 4;
     `;
     const Params = [savedListIndex];
     const [rows] = await connection.query(Query, Params);
@@ -52,7 +53,7 @@ async function getSourceAtSavedList(savedListIndex) {
  async function updateSavedList(conn, savedListIndex, title, userIndex) {
     const connection = conn;
     const Query = `
-    UPDATE SavedList SET title = ? WHERE savedListIndex = ? AND userIndex = ?;
+    UPDATE SavedList SET title = ? WHERE savedListIndex = ? AND userIndex = ? AND status = 'normal';
     `;
     const Params = [title, savedListIndex, userIndex];
     const [rows] = await connection.query(Query, Params);
@@ -66,7 +67,7 @@ async function getSourceAtSavedList(savedListIndex) {
  async function deleteSavedList(savedListIndex, userIndex) {
     const connection = await pool.getConnection(async (conn) => conn);
     const Query = `
-    UPDATE SavedList SET status = 'deleted' WHERE savedListIndex = ? AND userIndex = ?;
+    UPDATE SavedList SET status = 'deleted' WHERE savedListIndex = ? AND userIndex = ? AND status = 'normal';
     `;
     const Params = [savedListIndex, userIndex];
     const [rows] = await connection.query(Query, Params);
