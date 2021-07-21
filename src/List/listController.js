@@ -74,12 +74,15 @@ exports.allList = async function (req, res) {
  */
 exports.updateList = async function (req, res) {
     const userIndex = req.verifiedToken.userIndex;
-    const lists = req.body.lists;
-    if (!lists || lists == null || lists == undefined) return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+    let savedListIndex = req.body.savedListIndex;
+    let title = req.body.title;
 
-    const connection = await pool.getConnection(async (conn) => conn);
+    savedListIndex = parseInt(savedListIndex, 10);
+    
+    if (!title || !savedListIndex || Number.isNaN(savedListIndex))
+        return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+
     try {
-        await connection.beginTransaction();
         try {
             // 유저 찜 목록 조회
             const userSavedListRow = await listDao.getSavedList(userIndex);
@@ -87,25 +90,19 @@ exports.updateList = async function (req, res) {
             userSavedListRow.forEach(element => { userSavedList.push(element.savedListIndex); });
             const userSavedListSet = new Set(userSavedList);
 
-            for (let i=0; i<lists.length; i++) {
-                if (userSavedListSet.has(lists[i].savedListIndex)) {
-                    // 찜 목록 수정
-                    await listDao.updateSavedList(connection, lists[i].savedListIndex, lists[i].title, userIndex);
-                } else {
-                    return res.json(errResponse(baseResponse.SL_PARAMETER_INVALID));
-                }
-            };
+            if (!userSavedListSet.has(savedListIndex))
+                return res.json(errResponse(baseResponse.SL_PARAMETER_INVALID));
+
+            // 찜 목록 수정
+            await listDao.updateSavedList(savedListIndex, title, userIndex);
+            return res.send(response(baseResponse.SUCCESS));
         } catch(err) {
             logger.error(`찜 목록 수정 DB Error\n: ${JSON.stringify(err)}`);
             return res.json(errResponse(baseResponse.DB_ERROR));
         }
-        await connection.commit();
-        return res.send(response(baseResponse.SUCCESS));
     } catch (err) {
         logger.error(`찜 목록 수정 API Error\n: ${JSON.stringify(err)}`);
         return res.json(errResponse(baseResponse.SERVER_ERROR));
-    } finally {
-        connection.release();
     }
 };
 

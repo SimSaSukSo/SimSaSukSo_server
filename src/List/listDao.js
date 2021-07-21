@@ -50,13 +50,14 @@ async function getSourceAtSavedList(savedListIndex) {
  * update : 2021.07.17.
  * desc : 찜 목록 수정
  */
- async function updateSavedList(conn, savedListIndex, title, userIndex) {
-    const connection = conn;
+ async function updateSavedList(savedListIndex, title, userIndex) {
+    const connection = await pool.getConnection(async (conn) => conn);
     const Query = `
     UPDATE SavedList SET title = ? WHERE savedListIndex = ? AND userIndex = ? AND status = 'normal';
     `;
     const Params = [title, savedListIndex, userIndex];
     const [rows] = await connection.query(Query, Params);
+    connection.release();
     return rows;
 }
 
