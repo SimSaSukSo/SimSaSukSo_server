@@ -86,7 +86,7 @@ exports.index = async function (req, res) {
         };
 
         // 홈 화면 조회 성공
-        return res.send(response(baseResponse.SUCCESS, result));
+        return res.json(response(baseResponse.SUCCESS, result));
 
     } catch (err) {
         logger.error(`홈 화면 제공 API Error\n: ${JSON.stringify(err)}`);
@@ -139,7 +139,7 @@ exports.hot = async function (req, res) {
         };
 
         // 인기 피드 조회 성공
-        return res.send(response(baseResponse.SUCCESS, result));
+        return res.json(response(baseResponse.SUCCESS, result));
 
     } catch (err) {
         logger.error(`인기 피드 제공 API Error\n: ${JSON.stringify(err)}`);
@@ -177,7 +177,7 @@ exports.new = async function (req, res) {
         };
 
         // 최신 피드 조회 성공
-        return res.send(response(baseResponse.SUCCESS, result));
+        return res.json(response(baseResponse.SUCCESS, result));
 
     } catch (err) {
         logger.error(`최신 피드 제공 API Error\n: ${JSON.stringify(err)}`);
@@ -325,13 +325,11 @@ exports.uploadGeneralLodging = async function (req, res) {
 
         // 성공
         await connection.commit();
-
         const result = {
             type,
             lodgingIndex
         };
-
-        return res.send(response(baseResponse.SUCCESS, result));
+        return res.json(response(baseResponse.SUCCESS, result));
     } catch(err) {
         logger.error(`API 8 Error\n: ${JSON.stringify(err)}`);
         return res.json(errResponse(baseResponse.SERVER_ERROR));
@@ -485,17 +483,76 @@ exports.uploadGeneralLodging = async function (req, res) {
 
         // 성공
         await connection.commit();
-
         const result = {
             type,
             lodgingIndex
         };
-
-        return res.send(response(baseResponse.SUCCESS, result));
+        return res.json(response(baseResponse.SUCCESS, result));
     } catch(err) {
         logger.error(`API 9 Error\n: ${JSON.stringify(err)}`);
         return res.json(errResponse(baseResponse.SERVER_ERROR));
     } finally {
         connection.release();
+    }
+}
+
+
+/**
+ * update : 2021.07.25.
+ * desc : 찜하기/해제
+ */
+ exports.saveFeed = async function (req, res) {
+    const userIndex = req.verifiedToken.userIndex;
+    let { savedListIndex, feedIndex } = req.body;
+    savedListIndex = parseInt(savedListIndex, 10);
+    feedIndex = parseInt(feedIndex, 10);
+
+
+    // validation
+    if (!savedListIndex || !feedIndex)
+        return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+    
+    if (Number.isNaN(savedListIndex) || Number.isNaN(feedIndex))
+        return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_INVALID));
+
+    try {
+        try {
+            const isExistSavedList = await feedDao.isExistSavedList(savedListIndex, userIndex);
+            if (isExistSavedList.length == 0)
+                return res.json(errResponse(baseResponse.SL_PARAMETER_INVALID));
+
+            const isExistFeed = await feedDao.isExistFeed(feedIndex);
+            if (isExistFeed.length == 0)
+                return res.json(errResponse(baseResponse.FEED_EMPTY));
+        } catch {
+            logger.error(`API 15 - 목록 조회 DB Error\n: ${JSON.stringify(err)}`);
+            return res.json(errResponse(baseResponse.DB_ERROR));
+        }
+
+        try {
+            const feedInList = await feedDao.isExistFeedInSavedList(savedListIndex, feedIndex);
+
+            if (feedInList == 0) {
+                // 없으면 찜
+                await feedDao.createNewSavedFeed(savedListIndex, feedIndex);
+                return res.json(response(baseResponse.SUCCESS));
+            } else {
+                // 있는 경우에
+                // normal 이면 찜 해제, unsave 면 찜하기
+                if (feedInList[0].status == 'normal') {
+                    await feedDao.updateSavedFeed(feedInList[0].savedFeedIndex, 'unsave');
+                    return res.json(response(baseResponse.UNDO_SAVED_SUCCESS));
+                } else {
+                    await feedDao.updateSavedFeed(feedInList[0].savedFeedIndex, 'normal');
+                    return res.json(response(baseResponse.SUCCESS));
+                }    
+            }
+        } catch(err) {
+            logger.error(`API 15 - 찜하기/해제 중 Error\n: ${JSON.stringify(err)}`);
+            return res.json(errResponse(baseResponse.DB_ERROR));
+        }
+    } catch(err) {
+        logger.error(`API 15 Error\n: ${JSON.stringify(err)}`);
+        return res.json(errResponse(baseResponse.SERVER_ERROR));
     }
 }

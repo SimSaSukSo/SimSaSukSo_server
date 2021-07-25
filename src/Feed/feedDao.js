@@ -502,6 +502,79 @@ return rows;
   return rows;
 }
 
+/**
+ * update : 2021.07.25
+ * desc : API 15 - 유효한 찜목록인지 확인
+ */
+async function isExistSavedList(savedListIndex, userIndex) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const Query = `
+    SELECT savedListIndex FROM SavedList WHERE savedListIndex = ? AND userIndex = ? AND status = 'normal'; 
+    `;
+    const Params = [savedListIndex, userIndex];
+    const [rows] = await connection.query(Query, Params);
+    connection.release();
+    return rows;
+}
+
+async function isExistFeed(feedIndex) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const Query = `
+    SELECT feedIndex FROM Feed WHERE feedIndex = ? AND status = 'normal';
+    `;
+    const Params = [feedIndex];
+    const [rows] = await connection.query(Query, Params);
+    connection.release();
+    return rows;
+}
+
+/**
+ * update : 2021.07.25
+ * desc : API 15 - 유효한 피드인지 확인
+ */
+async function isExistFeedInSavedList(savedListIndex, feedIndex) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const Query = `
+    SELECT sf.savedFeedIndex, sf.status
+    FROM SavedFeed sf
+    WHERE sf.savedListIndex = ? AND sf.savedFeedIndex = ?;
+    `;
+    const Params = [savedListIndex, feedIndex];
+    const [rows] = await connection.query(Query, Params);
+    connection.release();
+    return rows;
+}
+
+/**
+ * update : 2021.07.25.
+ * desc : API 15 - 찜하기 (생성)
+ */
+async function createNewSavedFeed(savedListIndex, feedIndex) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const Query = `
+    INSERT INTO SavedFeed(savedListIndex, feedIndex) VALUES (?, ?);
+    `;
+    const Params = [savedListIndex, feedIndex];
+    const [rows] = await connection.query(Query, Params);
+    connection.release();
+    return rows;
+}
+
+/**
+ * update : 2021.07.25.
+ * desc : API 15 - 찜하기 (수정)
+ */
+ async function updateSavedFeed(savedFeedIndex, status) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  const Query = `
+  UPDATE SavedFeed SET status = ? WHERE savedFeedIndex = ?
+  `;
+  const Params = [status, savedFeedIndex];
+  const [rows] = await connection.query(Query, Params);
+  connection.release();
+  return rows;
+}
+
 module.exports = {
     homeTestDao,
     homeTestWithTagDao,
@@ -525,4 +598,9 @@ module.exports = {
     getHotFive,
     getTrend,
     getbelievePlaces,
+    isExistSavedList,
+    isExistFeed,
+    isExistFeedInSavedList,
+    createNewSavedFeed,
+    updateSavedFeed,
 };

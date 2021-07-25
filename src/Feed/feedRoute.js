@@ -8,4 +8,6 @@ module.exports = function(app){
 
     app.post('/api/feeds', jwtMiddleware, feed.uploadGeneralLodging);
     app.post('/api/feeds/airbnb', jwtMiddleware, feed.uploadAirbnb);
+
+    app.post('/api/saved-feeds', jwtMiddleware, feed.saveFeed);
 };
