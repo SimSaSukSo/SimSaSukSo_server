@@ -17,9 +17,7 @@ module.exports = function () {
     app.use(cors());
 
     /* App (Android, iOS) */
-    require('../src/User/userRoute')(app);
-    require('../src/Feed/feedRoute')(app);
-    require('../src/FeedView/feedViewRoute')(app);
+    require('../src/app/routes/indexRoute')(app);
 
     return app;
 };
