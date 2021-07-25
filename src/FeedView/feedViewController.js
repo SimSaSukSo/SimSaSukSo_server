@@ -11,9 +11,9 @@ const jwt = require("jsonwebtoken");
 const secret_config = require("../../config/secret");
 
 /**
- * API No. 10
+ * API No. 20
  * API Name : 피드 정보 조회
- * [GET] /api/feedView/:idx
+ * [GET] /api/feeds/:idx
  */
 exports.getFeed = async function (req, res) {
 
@@ -35,3 +35,29 @@ exports.getFeed = async function (req, res) {
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 };
+
+/**
+ * API No. 21
+ * API Name : 피드 정보 조회
+ * [GET] /api/feeds/:idx/comments
+ */
+exports.getComment = async function (req, res) {
+
+    const token = req.verifiedToken
+    const userIndex = token.userIndex
+    const feedIndex = req.params.idx
+
+    try {
+        const feedCommentResult = await feedViewProvider.retriveFeedComment(userIndex, feedIndex);
+
+        if (feedCommentResult.length == 0) {
+            return res.json(errResponse(baseResponse.FEED_COMMENT_EMPTY));
+        } else {
+            return res.send(response(baseResponse.SUCCESS, feedCommentResult));
+        }
+    } catch (err) {
+        console.log(err);
+        logger.error(`피드 정보 조회 중 Error`);
+        return res.json(errResponse(baseResponse.DB_ERROR));
+    }
+}
