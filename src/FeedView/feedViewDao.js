@@ -97,9 +97,9 @@ async function selectFeedInfo(connection, feedParams) {
 
 async function selectLodgingInfo(connection, feedParams) {
     const selectLodgingInfoQuery = `
-    SELECT Airbnb.airbnbIndex,
-                Airbnb.url,
-                FeedLodging.airbnbDesc as description
+    SELECT Airbnb.airbnbIndex as lodgingIndex,
+                Airbnb.url as info,
+                FeedLodging.airbnbDesc as address
         FROM Airbnb
         INNER JOIN(
             SELECT Feed.lodgingType,
@@ -111,9 +111,9 @@ async function selectLodgingInfo(connection, feedParams) {
         WHERE FeedLodging.lodgingType = 2 and
             FeedLodging.lodgingIndex = Airbnb.airbnbIndex
     UNION ALL
-    SELECT GeneralLodging.generalLodgingIndex,
-            GeneralLodging.name,
-            GeneralLodging.address
+    SELECT GeneralLodging.generalLodgingIndex as lodgingIndex,
+            GeneralLodging.name as info,
+            GeneralLodging.address as address
     FROM GeneralLodging
     INNER JOIN(
         SELECT Feed.lodgingType,
