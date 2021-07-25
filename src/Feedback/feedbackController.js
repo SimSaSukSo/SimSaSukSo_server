@@ -45,6 +45,7 @@ exports.getList = async function (req, res) {
                     sources.push(sourceRows[j].source);
                 
                 let feedInfo = {
+                    feedIndex,
                     avatarUrl,
                     nickname,
                     sources
@@ -59,5 +60,58 @@ exports.getList = async function (req, res) {
     } catch(err) {
         logger.error(`신뢰도 평가 목록 조회 API Error\n: ${JSON.stringify(err)}`);
         return res.json(errResponse(baseResponse.SERVER_ERROR));
+    }
+};
+
+/**
+ * update : 2021.07.25.
+ * desc : 신뢰도 평가
+ */
+ exports.createFeedback = async function (req, res) {
+    const userIndex = req.verifiedToken.userIndex;
+    const {
+        feedbacks
+    } = req.body;
+
+    if (!feedbacks || feedbacks.length == 0)
+        return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+
+    const connection = await pool.getConnection(async (conn) => conn);
+    try {
+        await connection.beginTransaction();
+
+        for (let i=0; i<feedbacks.length; i++) {
+            try {
+                // 유효한 피드인지 확인
+                let feedIndex = feedbacks[i].feedIndex
+                const isValidFeed = await feedbackDao.isExistFeed(feedIndex);
+                if (isValidFeed.length == 0)
+                    return res.json(errResponse(baseResponse.FEED_EMPTY));
+                
+                // degree 확인
+                let degree = parseInt(feedbacks[i].degree);
+                if (Number.isNaN(degree) || (degree < 1 || degree > 5))
+                    return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_INVALID));
+                
+                // 신뢰도 평가 저장
+                await feedbackDao.createFeedback(connection, userIndex, feedIndex, degree);
+
+            } catch(err) {
+                logger.error(`신뢰도 평가 목록 조회 - 숙소 조회 중 DB Error\n: ${JSON.stringify(err)}`);
+                return res.json(errResponse(baseResponse.DB_ERROR));
+            }
+        }
+
+        // 성공
+        await connection.commit();
+        const result = {
+            count: feedbacks.length
+        };
+        return res.send(response(baseResponse.SUCCESS, result));
+    } catch(err) {
+        logger.error(`신뢰도 평가 API Error\n: ${JSON.stringify(err)}`);
+        return res.json(errResponse(baseResponse.SERVER_ERROR));
+    } finally {
+        connection.release();
     }
 };

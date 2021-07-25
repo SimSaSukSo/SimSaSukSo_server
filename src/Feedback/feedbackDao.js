@@ -45,3 +45,24 @@ exports.getImageByFeedIndex = async function (feedIndex) {
     connection.release();
     return rows;
 }
+
+exports.isExistFeed = async function (feedIndex) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const Query = `
+    SELECT feedIndex FROM Feed WHERE feedIndex = ?
+    `;
+    const Params = [feedIndex];
+    const [rows] = await connection.query(Query, Params);
+    connection.release();
+    return rows;
+}
+
+exports.createFeedback = async function (conn, userIndex, feedIndex, degree) {
+    const connection = conn;
+    const Query = `
+    INSERT INTO Reliability(userIndex, feedIndex, degree) VALUES (?, ?, ?);
+    `;
+    const Params = [userIndex, feedIndex, degree];
+    const [rows] = await connection.query(Query, Params);
+    return rows;
+}
