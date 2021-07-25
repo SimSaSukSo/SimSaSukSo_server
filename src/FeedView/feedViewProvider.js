@@ -50,6 +50,9 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
       feedInfo["createdAt"] = feedInfo["createdAt"].toISOString().substring(0, 10);
     }
 
+    if (prosAndCons["keyword"]) {
+      prosAndCons["keyword"] = prosAndCons["keyword"].split(",");
+    }
     
     
   

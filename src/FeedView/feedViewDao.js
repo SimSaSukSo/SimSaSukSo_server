@@ -63,10 +63,11 @@ async function selectSave(connection, fuParams) {
 async function selectProsAndCons(connection, feedIndex) {
     const selectProsAndConsQuery = `
     SELECT FeedProsAndCons.status,
-        LodgingProsAndCons.keyword
+        group_concat(LodgingProsAndCons.keyword) as keyword
     FROM FeedProsAndCons, LodgingProsAndCons
-    WHERE FeedProsAndCons.feedIndex = ? and
-        FeedProsAndCons.lodgingProsAndConsIndex = LodgingProsAndCons.lodgingProsAndConsIndex;
+    WHERE FeedProsAndCons.feedIndex = 1 and
+        FeedProsAndCons.lodgingProsAndConsIndex = LodgingProsAndCons.lodgingProsAndConsIndex
+    GROUP BY FeedProsAndCons.status;
                 `;
     const [prosAndConsRow] = await connection.query(selectProsAndConsQuery, feedIndex);
     return prosAndConsRow;
