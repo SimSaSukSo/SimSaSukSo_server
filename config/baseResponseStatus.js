@@ -51,6 +51,7 @@ module.exports = {
     KAKAOUSER_REDUNDANT : {"isSuccess": false, "code": 3007, "message": "이미 가입된 유저입니다. 바로 로그인해주세요." },
 
     FEED_EMPTY : {"isSuccess": false, "code": 3010, "message": "피드 정보가 존재하지 않습니다." },
+    FEED_COMMENT_EMPTY : {"isSuccess": false, "code": 3011, "message": "피드 댓글 정보가 존재하지 않습니다." },
 
     REGION_WRONG : { "isSuccess": false, "code": 3030, "message": "유효하지 않은 지역입니다." },
     PAGE_WRONG : { "isSuccess": false, "code": 3031, "message": "유효하지 않은 페이지입니다." },

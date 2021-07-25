@@ -98,7 +98,7 @@ async function selectLodgingInfo(connection, feedParams) {
     const selectLodgingInfoQuery = `
     SELECT Airbnb.airbnbIndex,
             Airbnb.url,
-            Airbnb.description
+            Airbnb.status
     FROM Airbnb
     INNER JOIN(
         SELECT Feed.lodgingType,
@@ -126,6 +126,41 @@ async function selectLodgingInfo(connection, feedParams) {
     return lodgingInfoRow;
 }
 
+async function selectFeedComment(connection, feedCommentParams) {
+    const selectFeedCommentQuery = `
+     SELECT COMLIKE.commentIndex,
+            COMLIKE.userIndex,
+            COMLIKE.nickname,
+            COMLIKE.avatarUrl,
+            COMLIKE.content,
+            COMLIKE.createdAt,
+            COMLIKE.updatedAt,
+            count(CommentLike.commentIndex) as likeNum
+        FROM CommentLike
+        INNER JOIN(
+        SELECT Comment.commentIndex,
+            Comment.userIndex,
+            User.nickname,
+            User.avatarUrl,
+            Comment.content,
+            Comment.createdAt,
+            Comment.updatedAt
+        FROM CommentLike, Comment, User
+        WHERE (Comment.feedIndex = ? and
+            Comment.userIndex = User.userIndex) or
+            (Comment.feedIndex = ? and
+            Comment.commentIndex = CommentLike.commentIndex and
+            CommentLike.status = 'like' and
+            Comment.userIndex = User.userIndex)
+        GROUP BY Comment.commentIndex
+        ) COMLIKE
+        WHERE CommentLike.commentIndex = COMLIKE.commentIndex
+        GROUP BY CommentLike.commentIndex;
+                `;
+    const [feedCommentInfoRow] = await connection.query(selectFeedCommentQuery, feedCommentParams);
+    return feedCommentInfoRow;
+}
+
 module.exports = {
     selectImageList,
     selectLike,
@@ -134,5 +169,6 @@ module.exports = {
     selectProsAndCons,
     selectFeedInfo,
     selectLodgingInfo,
+    selectFeedComment,
 };
   

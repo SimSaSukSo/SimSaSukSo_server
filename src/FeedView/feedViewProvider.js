@@ -35,3 +35,16 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
   
     return result;
   };
+
+  exports.retriveFeedComment = async function (userIndex, feedIndex) {
+
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const feedParams = [feedIndex, feedIndex];
+
+    const feedComment = await feedViewDao.selectFeedComment(connection, feedParams);
+
+    connection.release();
+
+    return feedComment;
+  }
