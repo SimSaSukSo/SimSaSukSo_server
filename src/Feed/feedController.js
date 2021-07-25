@@ -531,7 +531,7 @@ exports.uploadGeneralLodging = async function (req, res) {
 
         try {
             const feedInList = await feedDao.isExistFeedInSavedList(savedListIndex, feedIndex);
-
+            
             if (feedInList == 0) {
                 // 없으면 찜
                 await feedDao.createNewSavedFeed(savedListIndex, feedIndex);

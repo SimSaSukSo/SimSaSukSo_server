@@ -537,7 +537,7 @@ async function isExistFeedInSavedList(savedListIndex, feedIndex) {
     const Query = `
     SELECT sf.savedFeedIndex, sf.status
     FROM SavedFeed sf
-    WHERE sf.savedListIndex = ? AND sf.savedFeedIndex = ?;
+    WHERE sf.savedListIndex = ? AND sf.feedIndex = ?;
     `;
     const Params = [savedListIndex, feedIndex];
     const [rows] = await connection.query(Query, Params);
