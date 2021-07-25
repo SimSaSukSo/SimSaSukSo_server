@@ -47,7 +47,7 @@ const selectCorrectionQuery = `
 async function selectSave(connection, fuParams) {
     const selectSaveQuery = `
     SELECT IFNULL(count(*), 0) as isSaved,
-        SaveFeed.saveNum
+           iFNULL(SaveFeed.saveNum, 0) as saveNum
     FROM SavedList
     INNER JOIN(
     SELECT savedListIndex,
