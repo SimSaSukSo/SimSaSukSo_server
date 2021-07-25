@@ -38,7 +38,7 @@ exports.allList = async function (req, res) {
             return res.json(errResponse(baseResponse.DB_ERROR));
         }
 
-        return res.send(response(baseResponse.SUCCESS, result));
+        return res.json(response(baseResponse.SUCCESS, result));
     } catch (err) {
         logger.error(`찜 목록 제공 API Error\n: ${JSON.stringify(err)}`);
         return res.json(errResponse(baseResponse.SERVER_ERROR));
@@ -61,7 +61,7 @@ exports.allList = async function (req, res) {
             logger.error(`찜 목록 생성 DB Error\n: ${JSON.stringify(err)}`);
             return res.json(errResponse(baseResponse.DB_ERROR));
         }
-        return res.send(response(baseResponse.SUCCESS));
+        return res.json(response(baseResponse.SUCCESS));
     } catch (err) {
         logger.error(`찜 목록 생성 API Error\n: ${JSON.stringify(err)}`);
         return res.json(errResponse(baseResponse.SERVER_ERROR));
@@ -95,7 +95,7 @@ exports.updateList = async function (req, res) {
 
             // 찜 목록 수정
             await listDao.updateSavedList(savedListIndex, title, userIndex);
-            return res.send(response(baseResponse.SUCCESS));
+            return res.json(response(baseResponse.SUCCESS));
         } catch(err) {
             logger.error(`찜 목록 수정 DB Error\n: ${JSON.stringify(err)}`);
             return res.json(errResponse(baseResponse.DB_ERROR));
@@ -128,7 +128,7 @@ exports.updateList = async function (req, res) {
             if (userSavedListSet.has(savedListIndex)) {
                 // 찜 목록 삭제
                 await listDao.deleteSavedList(savedListIndex, userIndex);
-                return res.send(response(baseResponse.SUCCESS));
+                return res.json(response(baseResponse.SUCCESS));
             } else {
                 return res.json(errResponse(baseResponse.SL_PARAMETER_INVALID));
             }
@@ -171,7 +171,7 @@ exports.updateList = async function (req, res) {
                 title = userSavedListRow[0].title;
                 const feeds = await listDao.getFeedsOfSavedList(savedListIndex, (page-1) * feedPerPage);
                 const result = { title, feeds };
-                return res.send(response(baseResponse.SUCCESS, result));
+                return res.json(response(baseResponse.SUCCESS, result));
             } else {
                 return res.json(errResponse(baseResponse.SL_PARAMETER_INVALID));
             }
