@@ -19,6 +19,42 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
     const prosAndCons = await feedViewDao.selectProsAndCons(connection, feedIndex);
     const [feedInfo] = await feedViewDao.selectFeedInfo(connection, feedParams);
     const [lodgingInfo] = await feedViewDao.selectLodgingInfo(connection, feedParams);
+    
+    if (correction["correctionToolIndex"]) {
+      correction["correctionToolIndex"] = correction["correctionToolIndex"].split(",");
+ 
+      correction["correctionToolIndex"] = correction["correctionToolIndex"].map( item => parseInt(item));
+  
+      correction["correctionTool"] = correction["correctionTool"].split(",");
+    }
+
+    if (feedInfo["reliability"]) {
+
+      feedInfo["reliability"] = parseInt(feedInfo["reliability"]);
+
+    }
+
+    if (feedInfo["hashTags"]) {
+      feedInfo["hashTags"] = feedInfo["hashTags"].split(",");
+    }
+
+    if (feedInfo["startDate"]) {
+      feedInfo["startDate"] = feedInfo["startDate"].toISOString().substring(0, 10);
+    }
+
+    if (feedInfo["endDate"]) {
+      feedInfo["endDate"] = feedInfo["endDate"].toISOString().substring(0, 10);
+    }
+
+    if (feedInfo["createdAt"]) {
+      feedInfo["createdAt"] = feedInfo["createdAt"].toISOString().substring(0, 10);
+    }
+
+    if (prosAndCons["keyword"]) {
+      prosAndCons["keyword"] = prosAndCons["keyword"].split(",");
+    }
+    
+    
   
     connection.release();
 
