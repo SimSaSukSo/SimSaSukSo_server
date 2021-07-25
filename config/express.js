@@ -21,6 +21,7 @@ module.exports = function () {
     require('../src/Feed/feedRoute')(app);
     require('../src/FeedView/feedViewRoute')(app);
     require('../src/List/listRoute')(app);
+    require('../src/Feedback/feedbackRoute')(app);
 
     return app;
 };
