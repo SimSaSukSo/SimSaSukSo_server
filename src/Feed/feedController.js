@@ -197,6 +197,8 @@ exports.uploadGeneralLodging = async function (req, res) {
     const userIndex = req.verifiedToken.userIndex;
     let generalLodgingIndex = 0;
     let feedIndex = 0;
+    let type = 1;
+    let lodgingIndex = 0;
 
     // 파라미터 있는지 확인
     if (!name || !images || !address || !startDate || !endDate || !charge || !correctionTool || !correctionDegree || !review) {
@@ -236,6 +238,7 @@ exports.uploadGeneralLodging = async function (req, res) {
             } else {
                 generalLodgingIndex = isSavedGeneralLodgingRow[0].generalLodgingIndex;
             }
+            lodgingIndex = generalLodgingIndex;
         } catch (err) {
             logger.error(`API 8 - 숙소 조회 중 Error\n: ${JSON.stringify(err)}`);
             return res.json(errResponse(baseResponse.DB_ERROR));
@@ -322,7 +325,13 @@ exports.uploadGeneralLodging = async function (req, res) {
 
         // 성공
         await connection.commit();
-        return res.send(response(baseResponse.SUCCESS));
+
+        const result = {
+            type,
+            lodgingIndex
+        };
+
+        return res.send(response(baseResponse.SUCCESS, result));
     } catch(err) {
         logger.error(`API 8 Error\n: ${JSON.stringify(err)}`);
         return res.json(errResponse(baseResponse.SERVER_ERROR));
@@ -343,6 +352,8 @@ exports.uploadGeneralLodging = async function (req, res) {
     const userIndex = req.verifiedToken.userIndex;
     let airbnbIndex = 0;
     let feedIndex = 0;
+    const type = 2;
+    let lodgingIndex = 0;
 
     // 파라미터 있는지 확인
     if (!locationId || !images || !description || !url || !startDate || !endDate || !charge || !correctionTool || !correctionDegree || !review) {
@@ -387,6 +398,7 @@ exports.uploadGeneralLodging = async function (req, res) {
                 // 있으면 index 할당
                 airbnbIndex = isSavedAirbnbRow[0].airbnbIndex;
             }
+            lodgingIndex = airbnbIndex;
         } catch (err) {
             logger.error(`API 9 - 에어비앤비 조회 중 Error\n: ${JSON.stringify(err)}`);
             return res.json(errResponse(baseResponse.DB_ERROR));
@@ -473,7 +485,13 @@ exports.uploadGeneralLodging = async function (req, res) {
 
         // 성공
         await connection.commit();
-        return res.send(response(baseResponse.SUCCESS));
+
+        const result = {
+            type,
+            lodgingIndex
+        };
+
+        return res.send(response(baseResponse.SUCCESS, result));
     } catch(err) {
         logger.error(`API 9 Error\n: ${JSON.stringify(err)}`);
         return res.json(errResponse(baseResponse.SERVER_ERROR));

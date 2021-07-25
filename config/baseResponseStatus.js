@@ -63,6 +63,8 @@ module.exports = {
     REGION_WRONG : { "isSuccess": false, "code": 3030, "message": "유효하지 않은 지역입니다." },
     PAGE_WRONG : { "isSuccess": false, "code": 3031, "message": "유효하지 않은 페이지입니다." },
 
+    FEEDBACK_PARAMETER_INVALID : { "isSuccess": false, "code": 3040, "message": "유효하지 않은 숙소" },
+
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},
     SERVER_ERROR : { "isSuccess": false, "code": 4001, "message": "서버 에러"},
