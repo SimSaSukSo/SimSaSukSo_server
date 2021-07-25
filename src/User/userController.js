@@ -45,11 +45,12 @@ const secret_config = require("../../config/secret");
             logger.info(avartarUrl);
             logger.info(nickname);
 
-            const [userResult] = await userProvider.retrieveUser(email);
-            console.log(userResult);
+            const userResult = await userProvider.retrieveUser(email);
+
             // 이미 회원가입된 유저일 경우
-            if(userResult) {
+            if(userResult.length != 0) {
                 try {
+                    let userIndex = userResult[0].userIndex;
                     // 회원가입 시 토큰 생성
                     let token = await jwt.sign(
                         {
@@ -79,6 +80,8 @@ const secret_config = require("../../config/secret");
             }
 
             const result = await userService.kakaoCreateUser(nickname, kakaoId, avartarUrl, email);
+            const newUserResult = await userProvider.retrieveUser(email);
+            let userIndex = newUserResult[0].userIndex;
 
             // 회원가입 시 토큰 생성
             let token = await jwt.sign(

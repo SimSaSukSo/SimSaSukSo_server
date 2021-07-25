@@ -97,17 +97,18 @@ async function selectFeedInfo(connection, feedParams) {
 async function selectLodgingInfo(connection, feedParams) {
     const selectLodgingInfoQuery = `
     SELECT Airbnb.airbnbIndex,
-            Airbnb.url,
-            Airbnb.status
-    FROM Airbnb
-    INNER JOIN(
-        SELECT Feed.lodgingType,
-            Feed.lodgingIndex
-        FROM  Feed
-        WHERE Feed.feedIndex = ?
-        ) FeedLodging
-    WHERE FeedLodging.lodgingType = 1 and
-        FeedLodging.lodgingIndex = Airbnb.airbnbIndex
+                Airbnb.url,
+                FeedLodging.airbnbDesc as description
+        FROM Airbnb
+        INNER JOIN(
+            SELECT Feed.lodgingType,
+                Feed.lodgingIndex,
+                Feed.airbnbDesc
+            FROM  Feed
+            WHERE Feed.feedIndex = ?
+            ) FeedLodging
+        WHERE FeedLodging.lodgingType = 2 and
+            FeedLodging.lodgingIndex = Airbnb.airbnbIndex
     UNION ALL
     SELECT GeneralLodging.generalLodgingIndex,
             GeneralLodging.name,
@@ -115,11 +116,12 @@ async function selectLodgingInfo(connection, feedParams) {
     FROM GeneralLodging
     INNER JOIN(
         SELECT Feed.lodgingType,
-            Feed.lodgingIndex
+            Feed.lodgingIndex,
+            Feed.airbnbDesc
         FROM  Feed
         WHERE Feed.feedIndex = ?
         ) FeedLodging
-    WHERE FeedLodging.lodgingType = 0 and
+    WHERE FeedLodging.lodgingType = 1 and
         FeedLodging.lodgingIndex = GeneralLodging.generalLodgingIndex;
                 `;
     const [lodgingInfoRow] = await connection.query(selectLodgingInfoQuery, feedParams);
