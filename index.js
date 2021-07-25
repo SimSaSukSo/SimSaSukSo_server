@@ -1,7 +1,7 @@
-// Todo: env파일로 포트 및 환경 관리하기
 const express = require('./config/express');
 const {logger} = require('./config/winston');
+require('dotenv').config();
 
-const port = 3000;
+const port = 4000 || process.env.PORT;
 express().listen(port);
 logger.info(`${process.env.NODE_ENV} - API Server Start At Port ${port}`);

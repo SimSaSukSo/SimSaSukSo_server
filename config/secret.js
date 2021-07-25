@@ -1,4 +1,5 @@
-// Todo: 이후 env 파일로 접근
+require('dotenv').config();
+
 module.exports = {
-    'jwtsecret' :  '',
+    'jwtsecret' :  process.env.JWT_SECRET
 };
