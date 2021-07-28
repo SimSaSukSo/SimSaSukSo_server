@@ -111,3 +111,34 @@ exports.getSearch = async function (req, res) {
     }
 
 }
+
+exports.like = async function(req, res) {
+    const token = req.verification;
+    const userIndex = token.userIndex;
+
+    const {feedIndex} = req.body;
+
+    try {
+        const feedLikeResult = await feedViewProvider.feedLike(userIndex, feedIndex);
+        return res.send(response(baseResponse.SUCCESS));
+        
+    } catch (err) {
+        console.log(err);
+        return res.json(errResponse(baseResponse.DB_ERROR));
+    }
+}
+
+exports.dislike = async function(req, res) {
+    const token = req.verification;
+    const userIndex = token.userIndex;
+
+    const {feedIndex} = req.body;
+
+    try {
+        const feedUnLikeResult = await feedViewProvider.feedDislike(userIndex, feedIndex);
+        return res.send(response(baseResponse.SUCCESS));
+    } catch (err) {
+        console.log(err);
+        return res.json(errResponse(baseResponse.DB_ERROR));
+    }
+}
