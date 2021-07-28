@@ -142,3 +142,37 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
     return feed;
 
   }
+
+  exports.feedLike = async function(userIndex, feedIndex) {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const param = [userIndex, feedIndex];
+
+    const selectLike = await feedViewDao.selectFeedLike(connection, param);
+
+    let likeResult;
+    if (selectLike.length == 0) {
+      likeResult = await feedViewDao.insertFeedLike(connection, param);
+      console.log('insert');
+    } else {
+      likeResult = await feedViewDao.updateFeedLike(connection, param);
+      console.log('update')
+    }
+
+    connection.release();
+
+    return likeResult;
+    
+  }
+
+  exports.feedDislike = async function(userIndex, feedIndex) {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const param = [userIndex, feedIndex];
+    
+    const unlikeResult = await feedViewDao.updateFeedDislike(connection, param);
+
+    connection.release();
+
+    return unlikeResult;
+  }

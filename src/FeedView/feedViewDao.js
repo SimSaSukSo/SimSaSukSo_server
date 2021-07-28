@@ -674,6 +674,42 @@ async function searchFeedProsAllHour(connection, paramsProsAll) {
     return feedInfoRow;
 }
 
+async function selectFeedLike(connection, param) {
+    const selectQuery = `
+        SELECT * FROM FeedLike WHERE userIndex = ? and feedIndex = ?;
+    `;
+
+    const [feedLike] = await connection.query(selectQuery, param);
+    return feedLike
+}
+
+async function insertFeedLike(connection, param) {
+    const insertQuery = `
+        INSERT INTO FeedLike(userIndex, feedIndex) VALUES (?, ?);
+    `;
+
+    const [feedLike] = await connection.query(insertQuery, param);
+    return feedLike
+}
+
+async function updateFeedLike(connection, param) {
+    const updateQuery = `
+        UPDATE FeedLike SET status = 'like' WHERE userIndex = ? and feedIndex = ?;
+    `;
+
+    const [feedLike] = await connection.query(updateQuery, param);
+    return feedLike
+}
+
+async function updateFeedDislike(connection, param) {
+    const updateQuery = `
+        UPDATE FeedLike SET status = 'dislike' WHERE userIndex = ? and feedIndex = ?;
+    `;
+
+    const [feedDisike] = await connection.query(updateQuery, param);
+    return feedDisike
+}
+
 module.exports = {
     selectImageList,
     selectLike,
@@ -693,5 +729,9 @@ module.exports = {
     searchFeedProsAllWeek,
     searchFeedProsAllDay,
     searchFeedProsAllHour,
+    selectFeedLike,
+    insertFeedLike,
+    updateFeedLike,
+    updateFeedDislike,
 };
   
