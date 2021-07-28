@@ -16,7 +16,7 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
     const [feedLike] = await feedViewDao.selectLike(connection, fufParams);
     const [correction] = await feedViewDao.selectCorrection(connection, feedParams);
     const [save] = await feedViewDao.selectSave(connection, fuParams);
-    const prosAndCons = await feedViewDao.selectProsAndCons(connection, feedIndex);
+    const proscons = await feedViewDao.selectProsAndCons(connection, feedIndex);
     const [feedInfo] = await feedViewDao.selectFeedInfo(connection, feedParams);
     const [lodgingInfo] = await feedViewDao.selectLodgingInfo(connection, feedParams);
     
@@ -50,11 +50,16 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
       feedInfo["createdAt"] = feedInfo["createdAt"].toISOString().substring(0, 10);
     }
 
-    if (prosAndCons["keyword"]) {
-      prosAndCons["keyword"] = prosAndCons["keyword"].split(",");
+    if (proscons["keyword"]) {
+      proscons["keyword"] = proscons["keyword"].split(",");
     }
     
     
+    const hashTags = feedInfo["hashTags"];
+
+    delete feedInfo.hashTags;
+
+    const prosAndCons = { "cons": proscons[0]["keyword"], "pros": proscons[1]["keyword"]};
   
     connection.release();
 
@@ -66,6 +71,7 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
       save,
       prosAndCons,
       feedInfo,
+      hashTags,
       lodgingInfo
     }
   
@@ -83,4 +89,56 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
     connection.release();
 
     return feedComment;
+  }
+
+  exports.retrieveSearch = async function (pros, cons, locationIdx, minPrice, maxPrice, interval) {
+
+    const connection = await pool.getConnection(async (conn) => conn);
+
+
+    const params = [pros, cons, locationIdx, locationIdx, minPrice, maxPrice];
+    const paramsProsAll = [cons, locationIdx, locationIdx, minPrice, maxPrice];
+
+    let feed;
+
+    if (pros.length == 0) {
+      if (interval == "year") {
+        feed = await feedViewDao.searchFeedProsAllYear(connection, paramsProsAll);
+      }
+      else if (interval == "month") {
+        feed = await feedViewDao.searchFeedProsAllMonth(connection, paramsProsAll);
+      }
+      else if (interval == "week") {
+        feed = await feedViewDao.searchFeedProsAllWeek(connection, paramsProsAll);
+      }
+      else if (interval == "day") {
+        feed = await feedViewDao.searchFeedProsAllDay(connection, paramsProsAll);
+      }
+      else if (interval == "hour") {
+        feed = await feedViewDao.searchFeedProsAllHour(connection, paramsProsAll);
+      }
+      
+    }
+    else {
+      if (interval == "year") {
+        feed = await feedViewDao.searchFeedYear(connection, params);
+      }
+      else if (interval == "month") {
+        feed = await feedViewDao.searchFeedMonth(connection, params);
+      }
+      else if (interval == "week") {
+        feed = await feedViewDao.searchFeedWeek(connection, params);
+      }
+      else if (interval == "day") {
+        feed = await feedViewDao.searchFeedDay(connection, params);
+      }
+      else if (interval == "hour") {
+        feed = await feedViewDao.searchFeedHour(connection, params);
+      }
+    } 
+    
+    connection.release();
+
+    return feed;
+
   }
