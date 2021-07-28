@@ -55,6 +55,10 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
     }
     
     
+    const hashTags = feedInfo["hashTags"];
+
+    delete feedInfo.hashTags;
+    
   
     connection.release();
 
@@ -66,6 +70,7 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
       save,
       prosAndCons,
       feedInfo,
+      hashTags,
       lodgingInfo
     }
   
