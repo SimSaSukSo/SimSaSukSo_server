@@ -55,7 +55,7 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
     }
     
     
-    const hashTags = feedInfo["hashTags"];
+    const hashTags = { "hashTags": feedInfo["hashTags"]};
 
     delete feedInfo.hashTags;
 
