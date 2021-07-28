@@ -60,7 +60,6 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
     delete feedInfo.hashTags;
 
     const prosAndCons = { "cons": proscons[0]["keyword"], "pros": proscons[1]["keyword"]};
-    
   
     connection.release();
 

@@ -4,6 +4,8 @@ module.exports = {
     SUCCESS : { "isSuccess": true, "code": 1000, "message":"성공" },
     LOGIN_SUCCESS: { "isSuccess": true, "code": 1001, "message":"재로그인 성공" },
 
+    UNDO_SAVED_SUCCESS: { "isSuccess": true, "code": 1011, "message":"찜 해제 성공" },
+
     // Common
     TOKEN_EMPTY : { "isSuccess": false, "code": 2000, "message":"JWT 토큰을 입력해주세요." },
     TOKEN_VERIFICATION_FAILURE : { "isSuccess": false, "code": 3000, "message":"JWT 토큰 검증 실패" },

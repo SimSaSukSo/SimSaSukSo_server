@@ -33,6 +33,7 @@ exports.getList = async function (req, res) {
             let result = [];
             // 평가하지 않은 피드 목록 인덱스 조회
             const feedList = await feedbackDao.getFeedListToFeedback(type, lodging, userIndex);
+
             // 각각의 이미지 조회
             for (let i=0; i<feedList.length; i++) {
                 let feedIndex = feedList[i].feedIndex;
@@ -40,16 +41,14 @@ exports.getList = async function (req, res) {
                 let nickname = feedList[i].nickname;
                 let avatarUrl = feedList[i].avatraUrl || "";
                 let sourceRows = await feedbackDao.getImageByFeedIndex(feedIndex);
-                let sources = [];
-                for (let j=0; j<sourceRows.length; j++)
-                    sources.push(sourceRows[j].source);
                 
                 let feedInfo = {
                     feedIndex,
                     avatarUrl,
                     nickname,
-                    sources
+                    sources: sourceRows
                 };
+
                 result.push(feedInfo);
             }
             return res.send(response(baseResponse.SUCCESS, result));
