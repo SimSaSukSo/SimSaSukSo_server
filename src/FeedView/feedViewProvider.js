@@ -16,7 +16,7 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
     const [feedLike] = await feedViewDao.selectLike(connection, fufParams);
     const [correction] = await feedViewDao.selectCorrection(connection, feedParams);
     const [save] = await feedViewDao.selectSave(connection, fuParams);
-    const prosAndCons = await feedViewDao.selectProsAndCons(connection, feedIndex);
+    const proscons = await feedViewDao.selectProsAndCons(connection, feedIndex);
     const [feedInfo] = await feedViewDao.selectFeedInfo(connection, feedParams);
     const [lodgingInfo] = await feedViewDao.selectLodgingInfo(connection, feedParams);
     
@@ -50,14 +50,16 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
       feedInfo["createdAt"] = feedInfo["createdAt"].toISOString().substring(0, 10);
     }
 
-    if (prosAndCons["keyword"]) {
-      prosAndCons["keyword"] = prosAndCons["keyword"].split(",");
+    if (proscons["keyword"]) {
+      proscons["keyword"] = proscons["keyword"].split(",");
     }
     
     
     const hashTags = feedInfo["hashTags"];
 
     delete feedInfo.hashTags;
+
+    const prosAndCons = { "cons": proscons[0]["keyword"], "pros": proscons[1]["keyword"]};
     
   
     connection.release();
