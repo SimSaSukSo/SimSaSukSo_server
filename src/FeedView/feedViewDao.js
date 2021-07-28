@@ -65,7 +65,7 @@ async function selectProsAndCons(connection, feedIndex) {
     SELECT FeedProsAndCons.status,
         group_concat(LodgingProsAndCons.keyword) as keyword
     FROM FeedProsAndCons, LodgingProsAndCons
-    WHERE FeedProsAndCons.feedIndex = 1 and
+    WHERE FeedProsAndCons.feedIndex = ? and
         FeedProsAndCons.lodgingProsAndConsIndex = LodgingProsAndCons.lodgingProsAndConsIndex
     GROUP BY FeedProsAndCons.status;
                 `;
