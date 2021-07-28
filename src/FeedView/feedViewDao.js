@@ -164,6 +164,516 @@ async function selectFeedComment(connection, feedCommentParams) {
     return feedCommentInfoRow;
 }
 
+async function searchFeedYear(connection, params) {
+    const getSearchQuery = `
+    SELECT FeedImage.feedIndex,
+        FeedImage.feedImageIndex,
+        FeedImage.source
+    fROM FeedImage
+    INNER JOIN(
+    SELECT DISTINCT Feed.feedIndex
+    FROM Feed
+    INNER JOIN(
+    SELECT DISTINCT FeedProsAndCons.feedIndex,
+                group_concat(FeedProsAndCons.lodgingProsAndConsIndex),
+                group_concat(LodgingProsAndCons.keyword)
+    FROM FeedProsAndCons,
+    LodgingProsAndCons
+    WHERE FeedProsAndCons.status = 'pros'
+    and LodgingProsAndCons.lodgingProsAndConsIndex = FeedProsAndCons.lodgingProsAndConsIndex and
+    FeedProsAndCons.lodgingProsAndConsIndex in (?)
+    GROUP BY FeedProsAndCons.feedIndex
+    ) PROS
+    INNER JOIN(
+    SELECT DISTINCT FeedProsAndCons.feedIndex,
+                group_concat(FeedProsAndCons.lodgingProsAndConsIndex),
+                group_concat(LodgingProsAndCons.keyword)
+    FROM FeedProsAndCons,
+    LodgingProsAndCons
+    WHERE FeedProsAndCons.status = 'cons'
+    and LodgingProsAndCons.lodgingProsAndConsIndex = FeedProsAndCons.lodgingProsAndConsIndex and
+    FeedProsAndCons.lodgingProsAndConsIndex not in (?)
+    GROUP BY FeedProsAndCons.feedIndex
+    ) CONS
+    INNER JOIN (
+    SELECT generalLodgingIndex
+    FROM GeneralLodging
+    WHERE locationIndex = ?
+    ) GENERAL
+    INNER JOIN(
+    SELECT Airbnb.airbnbIndex
+    FROM Airbnb
+    WHERE locationIndex = ?
+    ) AIR
+    WHERE ((Feed.lodgingType = 2 and
+    Feed.lodgingIndex = AIR.airbnbIndex) or
+    (Feed.lodgingType = 1 and
+    Feed.lodgingIndex = GENERAL.generalLodgingIndex)) and
+    Feed.charge >= ? and Feed.charge <= ? and
+    Feed.updatedAt >= date_add(now(), interval -1 year) and
+    Feed.feedIndex = PROS.feedIndex and
+    Feed.feedIndex = CONS.feedIndex
+    ) FFEED
+    WHERE FeedImage.feedIndex = FFEED.feedIndex and
+    FeedImage.uploadOrder = 1;
+    `;
+    const [feedInfoRow] = await connection.query(getSearchQuery, params);
+    return feedInfoRow;
+}
+
+async function searchFeedMonth(connection, params) {
+    const getSearchQuery = `
+    SELECT FeedImage.feedIndex,
+        FeedImage.feedImageIndex,
+        FeedImage.source
+    fROM FeedImage
+    INNER JOIN(
+    SELECT DISTINCT Feed.feedIndex
+    FROM Feed
+    INNER JOIN(
+    SELECT DISTINCT FeedProsAndCons.feedIndex,
+                group_concat(FeedProsAndCons.lodgingProsAndConsIndex),
+                group_concat(LodgingProsAndCons.keyword)
+    FROM FeedProsAndCons,
+    LodgingProsAndCons
+    WHERE FeedProsAndCons.status = 'pros'
+    and LodgingProsAndCons.lodgingProsAndConsIndex = FeedProsAndCons.lodgingProsAndConsIndex and
+    FeedProsAndCons.lodgingProsAndConsIndex in (?)
+    GROUP BY FeedProsAndCons.feedIndex
+    ) PROS
+    INNER JOIN(
+    SELECT DISTINCT FeedProsAndCons.feedIndex,
+                group_concat(FeedProsAndCons.lodgingProsAndConsIndex),
+                group_concat(LodgingProsAndCons.keyword)
+    FROM FeedProsAndCons,
+    LodgingProsAndCons
+    WHERE FeedProsAndCons.status = 'cons'
+    and LodgingProsAndCons.lodgingProsAndConsIndex = FeedProsAndCons.lodgingProsAndConsIndex and
+    FeedProsAndCons.lodgingProsAndConsIndex not in (?)
+    GROUP BY FeedProsAndCons.feedIndex
+    ) CONS
+    INNER JOIN (
+    SELECT generalLodgingIndex
+    FROM GeneralLodging
+    WHERE locationIndex = ?
+    ) GENERAL
+    INNER JOIN(
+    SELECT Airbnb.airbnbIndex
+    FROM Airbnb
+    WHERE locationIndex = ?
+    ) AIR
+    WHERE ((Feed.lodgingType = 2 and
+    Feed.lodgingIndex = AIR.airbnbIndex) or
+    (Feed.lodgingType = 1 and
+    Feed.lodgingIndex = GENERAL.generalLodgingIndex)) and
+    Feed.charge >= ? and Feed.charge <= ? and
+    Feed.updatedAt >= date_add(now(), interval -1 month) and
+    Feed.feedIndex = PROS.feedIndex and
+    Feed.feedIndex = CONS.feedIndex
+    ) FFEED
+    WHERE FeedImage.feedIndex = FFEED.feedIndex and
+    FeedImage.uploadOrder = 1;
+    `;
+    const [feedInfoRow] = await connection.query(getSearchQuery, params);
+    return feedInfoRow;
+}
+
+async function searchFeedWeek(connection, params) {
+    const getSearchQuery = `
+    SELECT FeedImage.feedIndex,
+        FeedImage.feedImageIndex,
+        FeedImage.source
+    fROM FeedImage
+    INNER JOIN(
+    SELECT DISTINCT Feed.feedIndex
+    FROM Feed
+    INNER JOIN(
+    SELECT DISTINCT FeedProsAndCons.feedIndex,
+                group_concat(FeedProsAndCons.lodgingProsAndConsIndex),
+                group_concat(LodgingProsAndCons.keyword)
+    FROM FeedProsAndCons,
+    LodgingProsAndCons
+    WHERE FeedProsAndCons.status = 'pros'
+    and LodgingProsAndCons.lodgingProsAndConsIndex = FeedProsAndCons.lodgingProsAndConsIndex and
+    FeedProsAndCons.lodgingProsAndConsIndex in (?)
+    GROUP BY FeedProsAndCons.feedIndex
+    ) PROS
+    INNER JOIN(
+    SELECT DISTINCT FeedProsAndCons.feedIndex,
+                group_concat(FeedProsAndCons.lodgingProsAndConsIndex),
+                group_concat(LodgingProsAndCons.keyword)
+    FROM FeedProsAndCons,
+    LodgingProsAndCons
+    WHERE FeedProsAndCons.status = 'cons'
+    and LodgingProsAndCons.lodgingProsAndConsIndex = FeedProsAndCons.lodgingProsAndConsIndex and
+    FeedProsAndCons.lodgingProsAndConsIndex not in (?)
+    GROUP BY FeedProsAndCons.feedIndex
+    ) CONS
+    INNER JOIN (
+    SELECT generalLodgingIndex
+    FROM GeneralLodging
+    WHERE locationIndex = ?
+    ) GENERAL
+    INNER JOIN(
+    SELECT Airbnb.airbnbIndex
+    FROM Airbnb
+    WHERE locationIndex = ?
+    ) AIR
+    WHERE ((Feed.lodgingType = 2 and
+    Feed.lodgingIndex = AIR.airbnbIndex) or
+    (Feed.lodgingType = 1 and
+    Feed.lodgingIndex = GENERAL.generalLodgingIndex)) and
+    Feed.charge >= ? and Feed.charge <= ? and
+    Feed.updatedAt >= date_add(now(), interval -7 day) and
+    Feed.feedIndex = PROS.feedIndex and
+    Feed.feedIndex = CONS.feedIndex
+    ) FFEED
+    WHERE FeedImage.feedIndex = FFEED.feedIndex and
+    FeedImage.uploadOrder = 1;
+    `;
+    const [feedInfoRow] = await connection.query(getSearchQuery, params);
+    return feedInfoRow;
+}
+
+async function searchFeedDay(connection, params) {
+    const getSearchQuery = `
+    SELECT FeedImage.feedIndex,
+        FeedImage.feedImageIndex,
+        FeedImage.source
+    fROM FeedImage
+    INNER JOIN(
+    SELECT DISTINCT Feed.feedIndex
+    FROM Feed
+    INNER JOIN(
+    SELECT DISTINCT FeedProsAndCons.feedIndex,
+                group_concat(FeedProsAndCons.lodgingProsAndConsIndex),
+                group_concat(LodgingProsAndCons.keyword)
+    FROM FeedProsAndCons,
+    LodgingProsAndCons
+    WHERE FeedProsAndCons.status = 'pros'
+    and LodgingProsAndCons.lodgingProsAndConsIndex = FeedProsAndCons.lodgingProsAndConsIndex and
+    FeedProsAndCons.lodgingProsAndConsIndex in (?)
+    GROUP BY FeedProsAndCons.feedIndex
+    ) PROS
+    INNER JOIN(
+    SELECT DISTINCT FeedProsAndCons.feedIndex,
+                group_concat(FeedProsAndCons.lodgingProsAndConsIndex),
+                group_concat(LodgingProsAndCons.keyword)
+    FROM FeedProsAndCons,
+    LodgingProsAndCons
+    WHERE FeedProsAndCons.status = 'cons'
+    and LodgingProsAndCons.lodgingProsAndConsIndex = FeedProsAndCons.lodgingProsAndConsIndex and
+    FeedProsAndCons.lodgingProsAndConsIndex not in (?)
+    GROUP BY FeedProsAndCons.feedIndex
+    ) CONS
+    INNER JOIN (
+    SELECT generalLodgingIndex
+    FROM GeneralLodging
+    WHERE locationIndex = ?
+    ) GENERAL
+    INNER JOIN(
+    SELECT Airbnb.airbnbIndex
+    FROM Airbnb
+    WHERE locationIndex = ?
+    ) AIR
+    WHERE ((Feed.lodgingType = 2 and
+    Feed.lodgingIndex = AIR.airbnbIndex) or
+    (Feed.lodgingType = 1 and
+    Feed.lodgingIndex = GENERAL.generalLodgingIndex)) and
+    Feed.charge >= ? and Feed.charge <= ? and
+    Feed.updatedAt >= date_add(now(), interval -1 day) and
+    Feed.feedIndex = PROS.feedIndex and
+    Feed.feedIndex = CONS.feedIndex
+    ) FFEED
+    WHERE FeedImage.feedIndex = FFEED.feedIndex and
+    FeedImage.uploadOrder = 1;
+    `;
+    const [feedInfoRow] = await connection.query(getSearchQuery, params);
+    return feedInfoRow;
+}
+
+async function searchFeedHour(connection, params) {
+    const getSearchQuery = `
+    SELECT FeedImage.feedIndex,
+        FeedImage.feedImageIndex,
+        FeedImage.source
+    fROM FeedImage
+    INNER JOIN(
+    SELECT DISTINCT Feed.feedIndex
+    FROM Feed
+    INNER JOIN(
+    SELECT DISTINCT FeedProsAndCons.feedIndex,
+                group_concat(FeedProsAndCons.lodgingProsAndConsIndex),
+                group_concat(LodgingProsAndCons.keyword)
+    FROM FeedProsAndCons,
+    LodgingProsAndCons
+    WHERE FeedProsAndCons.status = 'pros'
+    and LodgingProsAndCons.lodgingProsAndConsIndex = FeedProsAndCons.lodgingProsAndConsIndex and
+    FeedProsAndCons.lodgingProsAndConsIndex in (?)
+    GROUP BY FeedProsAndCons.feedIndex
+    ) PROS
+    INNER JOIN(
+    SELECT DISTINCT FeedProsAndCons.feedIndex,
+                group_concat(FeedProsAndCons.lodgingProsAndConsIndex),
+                group_concat(LodgingProsAndCons.keyword)
+    FROM FeedProsAndCons,
+    LodgingProsAndCons
+    WHERE FeedProsAndCons.status = 'cons'
+    and LodgingProsAndCons.lodgingProsAndConsIndex = FeedProsAndCons.lodgingProsAndConsIndex and
+    FeedProsAndCons.lodgingProsAndConsIndex not in (?)
+    GROUP BY FeedProsAndCons.feedIndex
+    ) CONS
+    INNER JOIN (
+    SELECT generalLodgingIndex
+    FROM GeneralLodging
+    WHERE locationIndex = ?
+    ) GENERAL
+    INNER JOIN(
+    SELECT Airbnb.airbnbIndex
+    FROM Airbnb
+    WHERE locationIndex = ?
+    ) AIR
+    WHERE ((Feed.lodgingType = 2 and
+    Feed.lodgingIndex = AIR.airbnbIndex) or
+    (Feed.lodgingType = 1 and
+    Feed.lodgingIndex = GENERAL.generalLodgingIndex)) and
+    Feed.charge >= ? and Feed.charge <= ? and
+    Feed.updatedAt >= date_add(now(), interval -1 hour) and
+    Feed.feedIndex = PROS.feedIndex and
+    Feed.feedIndex = CONS.feedIndex
+    ) FFEED
+    WHERE FeedImage.feedIndex = FFEED.feedIndex and
+    FeedImage.uploadOrder = 1;
+    `;
+    const [feedInfoRow] = await connection.query(getSearchQuery, params);
+    return feedInfoRow;
+}
+
+async function searchFeedProsAllYear(connection, paramsProsAll) {
+    const getSearchQuery = `
+    SELECT FeedImage.feedIndex,
+        FeedImage.feedImageIndex,
+        FeedImage.source
+    fROM FeedImage
+    INNER JOIN(
+    SELECT DISTINCT Feed.feedIndex
+    FROM Feed
+    INNER JOIN(
+    SELECT DISTINCT FeedProsAndCons.feedIndex,
+                group_concat(FeedProsAndCons.lodgingProsAndConsIndex),
+                group_concat(LodgingProsAndCons.keyword)
+    FROM FeedProsAndCons,
+    LodgingProsAndCons
+    WHERE FeedProsAndCons.status = 'cons'
+    and LodgingProsAndCons.lodgingProsAndConsIndex = FeedProsAndCons.lodgingProsAndConsIndex and
+    FeedProsAndCons.lodgingProsAndConsIndex not in (?)
+    GROUP BY FeedProsAndCons.feedIndex
+    ) CONS
+    INNER JOIN (
+    SELECT generalLodgingIndex
+    FROM GeneralLodging
+    WHERE locationIndex = ?
+    ) GENERAL
+    INNER JOIN(
+    SELECT Airbnb.airbnbIndex
+    FROM Airbnb
+    WHERE locationIndex = ?
+    ) AIR
+    WHERE ((Feed.lodgingType = 2 and
+    Feed.lodgingIndex = AIR.airbnbIndex) or
+    (Feed.lodgingType = 1 and
+    Feed.lodgingIndex = GENERAL.generalLodgingIndex)) and
+    Feed.charge >= ? and Feed.charge <= ? and
+    Feed.updatedAt >= date_add(now(), interval -1 year) and
+    Feed.feedIndex = CONS.feedIndex
+    ) FFEED
+    WHERE FeedImage.feedIndex = FFEED.feedIndex and
+    FeedImage.uploadOrder = 1;
+    `;
+    const [feedInfoRow] = await connection.query(getSearchQuery, paramsProsAll);
+    return feedInfoRow;
+}
+
+async function searchFeedProsAllMonth(connection, paramsProsAll) {
+    const getSearchQuery = `
+    SELECT FeedImage.feedIndex,
+        FeedImage.feedImageIndex,
+        FeedImage.source
+    fROM FeedImage
+    INNER JOIN(
+    SELECT DISTINCT Feed.feedIndex
+    FROM Feed
+    INNER JOIN(
+    SELECT DISTINCT FeedProsAndCons.feedIndex,
+                group_concat(FeedProsAndCons.lodgingProsAndConsIndex),
+                group_concat(LodgingProsAndCons.keyword)
+    FROM FeedProsAndCons,
+    LodgingProsAndCons
+    WHERE FeedProsAndCons.status = 'cons'
+    and LodgingProsAndCons.lodgingProsAndConsIndex = FeedProsAndCons.lodgingProsAndConsIndex and
+    FeedProsAndCons.lodgingProsAndConsIndex not in (?)
+    GROUP BY FeedProsAndCons.feedIndex
+    ) CONS
+    INNER JOIN (
+    SELECT generalLodgingIndex
+    FROM GeneralLodging
+    WHERE locationIndex = ?
+    ) GENERAL
+    INNER JOIN(
+    SELECT Airbnb.airbnbIndex
+    FROM Airbnb
+    WHERE locationIndex = ?
+    ) AIR
+    WHERE ((Feed.lodgingType = 2 and
+    Feed.lodgingIndex = AIR.airbnbIndex) or
+    (Feed.lodgingType = 1 and
+    Feed.lodgingIndex = GENERAL.generalLodgingIndex)) and
+    Feed.charge >= ? and Feed.charge <= ? and
+    Feed.updatedAt >= date_add(now(), interval -1 month) and
+    Feed.feedIndex = CONS.feedIndex
+    ) FFEED
+    WHERE FeedImage.feedIndex = FFEED.feedIndex and
+    FeedImage.uploadOrder = 1;
+    `;
+    const [feedInfoRow] = await connection.query(getSearchQuery, paramsProsAll);
+    return feedInfoRow;
+}
+
+async function searchFeedProsAllWeek(connection, paramsProsAll) {
+    const getSearchQuery = `
+    SELECT FeedImage.feedIndex,
+        FeedImage.feedImageIndex,
+        FeedImage.source
+    fROM FeedImage
+    INNER JOIN(
+    SELECT DISTINCT Feed.feedIndex
+    FROM Feed
+    INNER JOIN(
+    SELECT DISTINCT FeedProsAndCons.feedIndex,
+                group_concat(FeedProsAndCons.lodgingProsAndConsIndex),
+                group_concat(LodgingProsAndCons.keyword)
+    FROM FeedProsAndCons,
+    LodgingProsAndCons
+    WHERE FeedProsAndCons.status = 'cons'
+    and LodgingProsAndCons.lodgingProsAndConsIndex = FeedProsAndCons.lodgingProsAndConsIndex and
+    FeedProsAndCons.lodgingProsAndConsIndex not in (?)
+    GROUP BY FeedProsAndCons.feedIndex
+    ) CONS
+    INNER JOIN (
+    SELECT generalLodgingIndex
+    FROM GeneralLodging
+    WHERE locationIndex = ?
+    ) GENERAL
+    INNER JOIN(
+    SELECT Airbnb.airbnbIndex
+    FROM Airbnb
+    WHERE locationIndex = ?
+    ) AIR
+    WHERE ((Feed.lodgingType = 2 and
+    Feed.lodgingIndex = AIR.airbnbIndex) or
+    (Feed.lodgingType = 1 and
+    Feed.lodgingIndex = GENERAL.generalLodgingIndex)) and
+    Feed.charge >= ? and Feed.charge <= ? and
+    Feed.updatedAt >= date_add(now(), interval -7 day) and
+    Feed.feedIndex = CONS.feedIndex
+    ) FFEED
+    WHERE FeedImage.feedIndex = FFEED.feedIndex and
+    FeedImage.uploadOrder = 1;
+    `;
+    const [feedInfoRow] = await connection.query(getSearchQuery, paramsProsAll);
+    return feedInfoRow;
+}
+
+async function searchFeedProsAllDay(connection, paramsProsAll) {
+    const getSearchQuery = `
+    SELECT FeedImage.feedIndex,
+        FeedImage.feedImageIndex,
+        FeedImage.source
+    fROM FeedImage
+    INNER JOIN(
+    SELECT DISTINCT Feed.feedIndex
+    FROM Feed
+    INNER JOIN(
+    SELECT DISTINCT FeedProsAndCons.feedIndex,
+                group_concat(FeedProsAndCons.lodgingProsAndConsIndex),
+                group_concat(LodgingProsAndCons.keyword)
+    FROM FeedProsAndCons,
+    LodgingProsAndCons
+    WHERE FeedProsAndCons.status = 'cons'
+    and LodgingProsAndCons.lodgingProsAndConsIndex = FeedProsAndCons.lodgingProsAndConsIndex and
+    FeedProsAndCons.lodgingProsAndConsIndex not in (?)
+    GROUP BY FeedProsAndCons.feedIndex
+    ) CONS
+    INNER JOIN (
+    SELECT generalLodgingIndex
+    FROM GeneralLodging
+    WHERE locationIndex = ?
+    ) GENERAL
+    INNER JOIN(
+    SELECT Airbnb.airbnbIndex
+    FROM Airbnb
+    WHERE locationIndex = ?
+    ) AIR
+    WHERE ((Feed.lodgingType = 2 and
+    Feed.lodgingIndex = AIR.airbnbIndex) or
+    (Feed.lodgingType = 1 and
+    Feed.lodgingIndex = GENERAL.generalLodgingIndex)) and
+    Feed.charge >= ? and Feed.charge <= ? and
+    Feed.updatedAt >= date_add(now(), interval -1 day) and
+    Feed.feedIndex = CONS.feedIndex
+    ) FFEED
+    WHERE FeedImage.feedIndex = FFEED.feedIndex and
+    FeedImage.uploadOrder = 1;
+    `;
+    const [feedInfoRow] = await connection.query(getSearchQuery, paramsProsAll);
+    return feedInfoRow;
+}
+
+async function searchFeedProsAllHour(connection, paramsProsAll) {
+    const getSearchQuery = `
+    SELECT FeedImage.feedIndex,
+        FeedImage.feedImageIndex,
+        FeedImage.source
+    fROM FeedImage
+    INNER JOIN(
+    SELECT DISTINCT Feed.feedIndex
+    FROM Feed
+    INNER JOIN(
+    SELECT DISTINCT FeedProsAndCons.feedIndex,
+                group_concat(FeedProsAndCons.lodgingProsAndConsIndex),
+                group_concat(LodgingProsAndCons.keyword)
+    FROM FeedProsAndCons,
+    LodgingProsAndCons
+    WHERE FeedProsAndCons.status = 'cons'
+    and LodgingProsAndCons.lodgingProsAndConsIndex = FeedProsAndCons.lodgingProsAndConsIndex and
+    FeedProsAndCons.lodgingProsAndConsIndex not in (?)
+    GROUP BY FeedProsAndCons.feedIndex
+    ) CONS
+    INNER JOIN (
+    SELECT generalLodgingIndex
+    FROM GeneralLodging
+    WHERE locationIndex = ?
+    ) GENERAL
+    INNER JOIN(
+    SELECT Airbnb.airbnbIndex
+    FROM Airbnb
+    WHERE locationIndex = ?
+    ) AIR
+    WHERE ((Feed.lodgingType = 2 and
+    Feed.lodgingIndex = AIR.airbnbIndex) or
+    (Feed.lodgingType = 1 and
+    Feed.lodgingIndex = GENERAL.generalLodgingIndex)) and
+    Feed.charge >= ? and Feed.charge <= ? and
+    Feed.updatedAt >= date_add(now(), interval -1 hour) and
+    Feed.feedIndex = CONS.feedIndex
+    ) FFEED
+    WHERE FeedImage.feedIndex = FFEED.feedIndex and
+    FeedImage.uploadOrder = 1;
+    `;
+    const [feedInfoRow] = await connection.query(getSearchQuery, paramsProsAll);
+    return feedInfoRow;
+}
+
 module.exports = {
     selectImageList,
     selectLike,
@@ -173,5 +683,15 @@ module.exports = {
     selectFeedInfo,
     selectLodgingInfo,
     selectFeedComment,
+    searchFeedYear,
+    searchFeedMonth,
+    searchFeedWeek,
+    searchFeedDay,
+    searchFeedHour,
+    searchFeedProsAllYear,
+    searchFeedProsAllMonth,
+    searchFeedProsAllWeek,
+    searchFeedProsAllDay,
+    searchFeedProsAllHour,
 };
   

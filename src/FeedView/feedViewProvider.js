@@ -84,3 +84,55 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
 
     return feedComment;
   }
+
+  exports.retrieveSearch = async function (pros, cons, locationIdx, minPrice, maxPrice, interval) {
+
+    const connection = await pool.getConnection(async (conn) => conn);
+
+
+    const params = [pros, cons, locationIdx, locationIdx, minPrice, maxPrice];
+    const paramsProsAll = [cons, locationIdx, locationIdx, minPrice, maxPrice];
+
+    let feed;
+
+    if (pros.length == 0) {
+      if (interval == "year") {
+        feed = await feedViewDao.searchFeedProsAllYear(connection, paramsProsAll);
+      }
+      else if (interval == "month") {
+        feed = await feedViewDao.searchFeedProsAllMonth(connection, paramsProsAll);
+      }
+      else if (interval == "week") {
+        feed = await feedViewDao.searchFeedProsAllWeek(connection, paramsProsAll);
+      }
+      else if (interval == "day") {
+        feed = await feedViewDao.searchFeedProsAllDay(connection, paramsProsAll);
+      }
+      else if (interval == "hour") {
+        feed = await feedViewDao.searchFeedProsAllHour(connection, paramsProsAll);
+      }
+      
+    }
+    else {
+      if (interval == "year") {
+        feed = await feedViewDao.searchFeedYear(connection, params);
+      }
+      else if (interval == "month") {
+        feed = await feedViewDao.searchFeedMonth(connection, params);
+      }
+      else if (interval == "week") {
+        feed = await feedViewDao.searchFeedWeek(connection, params);
+      }
+      else if (interval == "day") {
+        feed = await feedViewDao.searchFeedDay(connection, params);
+      }
+      else if (interval == "hour") {
+        feed = await feedViewDao.searchFeedHour(connection, params);
+      }
+    } 
+    
+    connection.release();
+
+    return feed;
+
+  }
