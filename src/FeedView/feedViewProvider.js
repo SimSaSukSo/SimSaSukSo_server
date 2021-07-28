@@ -53,14 +53,29 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
     if (proscons["keyword"]) {
       proscons["keyword"] = proscons["keyword"].split(",");
     }
-    
-    
-    const hashTags = { "hashTags": feedInfo["hashTags"]};
 
+    let hashTags = [];
+    
+    if (feedInfo["hashTags"]) {
+      for(var i = 0; i<feedInfo["hashTags"].length; i++) {
+        hashTags.push({ "hashTags":feedInfo["hashTags"][i]} );
+      }
+      
+    }
+  
     delete feedInfo.hashTags;
 
-    const prosAndCons = { "cons": proscons[0]["keyword"], "pros": proscons[1]["keyword"]};
-  
+    let prosAndCons;
+    if (proscons[0] && proscons[1]) {
+      prosAndCons = { "cons": proscons[0]["keyword"], "pros": proscons[1]["keyword"]};
+    }
+    else if(proscons[0] && proscons[0]["status"] == "pros") {
+      prosAndCons = { "pros": proscons[0]["keyword"]};
+    }
+    else {
+      prosAndCons = { "cons": proscons[0]["keyword"]};
+    }
+
     connection.release();
 
 

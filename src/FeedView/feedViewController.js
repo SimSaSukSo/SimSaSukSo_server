@@ -24,7 +24,7 @@ exports.getFeed = async function (req, res) {
     try {
         const feedInfoResult = await feedViewProvider.retriveFeedInfo(userIndex, feedIndex);
 
-        if (!feedInfoResult) {
+        if (feedInfoResult["feedImage"].length == 0) {
             return res.json(errResponse(baseResponse.FEED_EMPTY));
         } else {
             return res.send(response(baseResponse.SUCCESS, feedInfoResult));
