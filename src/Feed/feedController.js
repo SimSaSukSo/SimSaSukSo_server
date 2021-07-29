@@ -20,7 +20,10 @@ exports.index = async function (req, res) {
 
     // 유효성 검사
     if (!locationId) return res.json(errResponse(baseResponse.REGION_EMPTY));
-    if (Number.isNaN(locationId) || locationId < 1000 || locationId > 1015) return res.json(errResponse(baseResponse.REGION_WRONG));
+    if (Number.isNaN(locationId)) return res.json(errResponse(baseResponse.REGION_WRONG));
+    if (locationId != 2000) {
+        if (locationId < 1000 || locationId > 1015) return res.json(errResponse(baseResponse.REGION_WRONG));
+    }
     
     // 지역명, 지역 범위 추출
     const regionName = location.getRegionNameByLocationId(locationId);

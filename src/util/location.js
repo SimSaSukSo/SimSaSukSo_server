@@ -36,7 +36,8 @@ exports.getRegionNameByLocationId = (locationId) => {
     else if (locationId == 1012) return "전북";
     else if (locationId == 1013) return "대전";
     else if (locationId == 1014) return "충남";
-    else return "충북";
+    else if (locationId == 1015) return "충북";
+    else return "전체";
 }
 
 // locationId로 지역별 locationIndex 범위 추출;
@@ -56,5 +57,6 @@ exports.getLocationRangeByLocationId = (locationId) => {
     else if (locationId == 1012) return [141, 148];
     else if (locationId == 1013) return [149, 152];
     else if (locationId == 1014) return [153, 165];
-    else return [166, 172];
+    else if (locationId == 1016) return [166, 172];
+    else return [1, 172];
 }
