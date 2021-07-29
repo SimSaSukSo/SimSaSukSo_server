@@ -108,7 +108,7 @@ exports.hot = async function (req, res) {
     if (!page) page = 1;
 
     page = parseInt(page, 10);
-    if (Number.isNaN(page)) return res.json(errResponse(baseResponse.PAGE_WRONG));
+    if (Number.isNaN(page) || page < 1) return res.json(errResponse(baseResponse.PAGE_WRONG));
 
     try {
         // 인기 해시태그, 피드 제공 + 페이징
@@ -167,7 +167,7 @@ exports.new = async function (req, res) {
     if (!page) page = 1;
 
     page = parseInt(page, 10);
-    if (Number.isNaN(page)) return res.json(errResponse(baseResponse.PAGE_WRONG));
+    if (Number.isNaN(page) || page < 1) return res.json(errResponse(baseResponse.PAGE_WRONG));
 
     try {
         // 피드 제공 + 페이징
