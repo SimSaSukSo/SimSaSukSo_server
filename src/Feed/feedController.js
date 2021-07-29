@@ -136,9 +136,15 @@ exports.hot = async function (req, res) {
             return res.json(errResponse(baseResponse.DB_ERROR));
         }
 
+        // 마지막 페이지인지
+        let isLast = false;
+        if (feeds.length < feedPerPage)
+            isLast = true;
+
         const result = {
             hashTags,
-            feeds
+            feeds,
+            isLast
         };
 
         // 인기 피드 조회 성공
@@ -175,8 +181,14 @@ exports.new = async function (req, res) {
             return res.json(errResponse(baseResponse.DB_ERROR));
         }
 
+        // 마지막 페이지인지
+        let isLast = false;
+        if (feeds.length < feedPerPage)
+            isLast = true;
+
         const result = {
-            feeds
+            feeds,
+            isLast
         };
 
         // 최신 피드 조회 성공
