@@ -21,3 +21,11 @@ exports.retrieveNickname = async function(nickname) {
 
   return nicknameResult;
 };
+
+exports.retrieveUserByApple = async function(appleId) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  const [appleResult] = await userDao.selectUserApple(connection, appleId);
+  connection.release();
+
+  return appleResult;
+};

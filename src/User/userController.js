@@ -1,4 +1,3 @@
-const jwtMiddleware = require("../../config/jwtMiddleware");
 const userProvider = require("../../src/User/userProvider");
 const {logger} = require("../../config/winston");
 const userService = require("../../src/User/userService");
@@ -8,7 +7,11 @@ const axios = require("axios");
 const regexEmail = require("regex-email");
 const {emit} = require("nodemon");
 const jwt = require("jsonwebtoken");
+const AppleAuth = require('apple-auth');
 const secret_config = require("../../config/secret");
+const appleAuthConfig = require("../../config/appleAuthConfig");
+
+const apple = new AppleAuth(appleAuthConfig, '../../config/appleAuthKey/AuthKey_AB12CD123E.p8');
 
 /**
  * API No. 1
@@ -191,4 +194,98 @@ exports.setNickname = async function (req, res) {
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 
+};
+
+/**
+ * API No. 3
+ * API Name : 애플 로그인/ 회원가입
+ * [POST] /app/users/appleLogin
+ */
+ exports.appleLogin = async function (req, res) {
+    /**
+     * Body: accessToken
+     */
+    const accessToken = req.body.accessToken;
+    let email, nickname;
+    let appleId = accessToken;
+    
+    if(!accessToken)
+        return res.send(errResponse(baseResponse.ACCESSTOKEN_EMPTY));
+    
+    try {
+        const loginAgainResult = response(baseResponse.LOGIN_SUCCESS);
+        const userResult = await userProvider.retrieveUserByApple(appleId);
+
+        // 이미 회원가입된 유저일 경우
+        if(userResult.length != 0) {
+            try {
+                const userIndex = userResult[0].userIndex;
+                const email = userResult[0].email;
+                const nickname = userResult[0].nickname;
+
+                // 회원가입 시 토큰 생성
+                let token = await jwt.sign(
+                    {
+                        appleId: appleId,
+                        nickname: nickname,
+                        email: email,
+                        userIndex: userIndex
+                    }, // 토큰의 내용(payload)
+                    secret_config.jwtsecret, // 비밀키
+                    {
+                        expiresIn: "365d",
+                        subject: "userInfo",
+                    } // 유효 기간 365일
+                );
+
+                // 토큰 생성 성공
+                if (token) {
+                    loginAgainResult.token = token;
+                    return res.send(loginAgainResult);
+                }
+
+            } catch (err) {
+                console.log(err)
+                logger.error(`재로그인 중 Error`);
+                return res.json(errResponse(baseResponse.SERVER_ERROR));
+            }
+        }
+
+
+        /// 여기서부터 작업
+        // 애플은 이름, 이메일, 얻어내고
+        // email = dsadasd;
+        // nickname = dasadsa;
+
+        const result = await userService.appleCreateUser(nickname, appleId, email);
+        const newUserResult = await userProvider.retrieveUser(email);
+        let userIndex = newUserResult[0].userIndex;
+
+        // 회원가입 시 토큰 생성
+        let token = await jwt.sign(
+        {
+            appleId: appleId,
+            nickname: nickname,
+            email: email,
+            userIndex: userIndex
+        }, // 토큰의 내용(payload)
+        secret_config.jwtsecret, // 비밀키
+        {
+            expiresIn: "365d",
+            subject: "userInfo",
+        } // 유효 기간 365일
+        );
+        // 토큰 생성 성공
+        if (token) {
+            const tokenRes = {
+                result,
+                "token": token
+            };
+            return res.send(tokenRes);
+        }
+    } catch (err) {
+        console.log(err);
+        logger.error(`애플 로그인/회원가입 중 Error`);
+        return res.json(errResponse(baseResponse.DB_ERROR));
+    }
 };

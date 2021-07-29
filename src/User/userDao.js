@@ -20,6 +20,16 @@ async function selectUserNickname(connection, nickname) {
   return nicknameRow;
 }
 
+async function selectUserApple(connection, appleId) {
+  const selectAppleQuery = `
+                  SELECT userIndex, email, nickname
+                  FROM User
+                  WHERE apple = ?;
+  `;
+  const [appleRow] = await connection.query(selectAppleQuery, appleId);
+  return appleRow;
+}
+
 // 카카오 연동 회원 가입
 async function insertUserInfo(connection, insertUserInfoParams) {
   const insertUserInfoQuery = `
@@ -33,6 +43,21 @@ async function insertUserInfo(connection, insertUserInfoParams) {
 
   return insertUserInfoRow;
 }
+
+// 애플 연동 회원 가입
+async function insertUserInfoByApple(connection, insertUserInfoParams) {
+  const insertUserInfoQuery = `
+        INSERT INTO User(nickname, appleId, email)
+        VALUES (?, ?, ?);
+    `;
+  const insertUserInfoRow = await connection.query(
+    insertUserInfoQuery,
+    insertUserInfoParams
+  );
+
+  return insertUserInfoRow;
+}
+
 
 // 닉네임 설정
 async function updateUserNickname(connection, insertUserInfoParams) {
@@ -54,5 +79,7 @@ module.exports = {
   selectUserEmail,
   selectUserNickname,
   insertUserInfo,
+  insertUserInfoByApple,
   updateUserNickname,
+  selectUserApple,
 };
