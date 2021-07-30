@@ -710,6 +710,33 @@ async function updateFeedDislike(connection, param) {
     return feedDisike
 }
 
+async function postFeedComment(connection, insertParams) {
+    const insertCommentQuery = `
+        INSERT INTO Comment(userIndex, feedIndex, content) VALUES (?, ?, ?);
+    `;
+
+    const [postComment] = await connection.query(insertCommentQuery, insertParams);
+    return postComment
+}
+
+async function putFeedComment(connection, putParams) {
+    const putCommentQuery = `
+        UPDATE Comment SET content = ? WHERE userIndex = ? and commentIndex = ? and feedIndex = ?;
+    `;
+
+    const [putComment] = await connection.query(putCommentQuery, putParams);
+    return putComment
+}
+
+async function deleteFeedComment(connection, deleteParams) {
+    const deleteCommentQuery = `
+        DELETE FROM Comment WHERE userIndex = ? and commentIndex = ? and feedIndex = ?;
+    `;
+
+    const [deleteComment] = await connection.query(deleteCommentQuery, deleteParams);
+    return deleteComment
+}
+
 module.exports = {
     selectImageList,
     selectLike,
@@ -733,5 +760,8 @@ module.exports = {
     insertFeedLike,
     updateFeedLike,
     updateFeedDislike,
+    postFeedComment,
+    putFeedComment,
+    deleteFeedComment,
 };
   

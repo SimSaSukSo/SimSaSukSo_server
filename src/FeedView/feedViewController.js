@@ -142,3 +142,54 @@ exports.dislike = async function(req, res) {
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
+
+exports.postComment = async function(req, res) {
+    const token = req.verification;
+    const userIndex = token.userIndex;
+    const feedIndex = req.params.idx;
+
+    const {content} = req.body;
+
+    try {
+        const postCommentResult = await feedViewService.feedPostComment(userIndex, feedIndex, content);
+        return res.send(response(baseResponse.SUCCESS));
+    } catch (err) {
+        console.log(err);
+        console.log('댓글 작성 API 중 에러');
+        return res.json(errResponse(baseResponse.DB_ERROR));
+    }
+}
+
+exports.putComment = async function(req, res) {
+    const token = req.verification;
+    const userIndex = token.userIndex;
+    const feedIndex = req.params.idx;
+
+    const {content, commentIndex} = req.body;
+    
+    try {
+        const putCommentResult = await feedViewService.feedPutComment(content, userIndex, commentIndex, feedIndex);
+        return res.send(response(baseResponse.SUCCESS));
+    } catch (err) {
+        console.log(err);
+        console.log('댓글 수정 API 중 에러');
+        return res.json(errResponse(baseResponse.DB_ERROR));
+    }
+}
+
+exports.deleteComment = async function(req, res) {
+    const token = req.verification;
+    const userIndex = token.userIndex;
+    const feedIndex = req.params.idx;
+
+    const {commentIndex} = req.body;
+
+    try {
+        const deleteCommentResult = await feedViewService.feedDeleteComment(userIndex, commentIndex, feedIndex);
+        return res.send(response(baseResponse.SUCCESS));
+    } catch (err) {
+        console.log(err);
+        console.log('댓글 삭제 API 중 에러');
+        return res.json(errResponse(baseResponse.DB_ERROR));
+    }
+}
