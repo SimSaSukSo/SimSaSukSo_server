@@ -216,7 +216,7 @@ async function searchFeedYear(connection, params) {
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
     FeedImage.uploadOrder = 1
-    ORDER BY FeedImage.createdAt;
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, params);
     return feedInfoRow;
@@ -274,7 +274,7 @@ async function searchFeedMonth(connection, params) {
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
     FeedImage.uploadOrder = 1
-    ORDER BY FeedImage.createdAt;
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, params);
     return feedInfoRow;
@@ -332,7 +332,7 @@ async function searchFeedWeek(connection, params) {
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
     FeedImage.uploadOrder = 1
-    ORDER BY FeedImage.createdAt;
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, params);
     return feedInfoRow;
@@ -390,7 +390,7 @@ async function searchFeedDay(connection, params) {
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
     FeedImage.uploadOrder = 1
-    ORDER BY FeedImage.createdAt;
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, params);
     return feedInfoRow;
@@ -448,7 +448,7 @@ async function searchFeedHour(connection, params) {
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
     FeedImage.uploadOrder = 1
-    ORDER BY FeedImage.createdAt;
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, params);
     return feedInfoRow;
@@ -494,7 +494,7 @@ async function searchFeedProsAllYear(connection, paramsProsAll) {
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
     FeedImage.uploadOrder = 1
-    ORDER BY FeedImage.createdAt;
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, paramsProsAll);
     return feedInfoRow;
@@ -540,7 +540,7 @@ async function searchFeedProsAllMonth(connection, paramsProsAll) {
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
     FeedImage.uploadOrder = 1
-    ORDER BY FeedImage.createdAt;
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, paramsProsAll);
     return feedInfoRow;
@@ -586,7 +586,7 @@ async function searchFeedProsAllWeek(connection, paramsProsAll) {
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
     FeedImage.uploadOrder = 1
-    ORDER BY FeedImage.createdAt;
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, paramsProsAll);
     return feedInfoRow;
@@ -632,7 +632,7 @@ async function searchFeedProsAllDay(connection, paramsProsAll) {
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
     FeedImage.uploadOrder = 1
-    ORDER BY FeedImage.createdAt;
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, paramsProsAll);
     return feedInfoRow;
@@ -678,7 +678,7 @@ async function searchFeedProsAllHour(connection, paramsProsAll) {
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
     FeedImage.uploadOrder = 1
-    ORDER BY FeedImage.createdAt;
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, paramsProsAll);
     return feedInfoRow;
