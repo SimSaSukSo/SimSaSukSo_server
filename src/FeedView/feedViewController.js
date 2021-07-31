@@ -74,9 +74,6 @@ exports.getSearch = async function (req, res) {
      */
     let {pros, cons, locationIdx, minPrice, maxPrice, interval} = req.body;
 
-    //const token = req.verification;
-    //const userIndex = token.userIndex;
-
     if(!locationIdx) {
         return res.json(errResponse(baseResponse.SEARCH_LOCATION_EMPTY));
     }
@@ -113,7 +110,7 @@ exports.getSearch = async function (req, res) {
 }
 
 exports.like = async function(req, res) {
-    const token = req.verification;
+    const token = req.verifiedToken;
     const userIndex = token.userIndex;
     const feedIndex = req.params.idx;
 
@@ -128,7 +125,7 @@ exports.like = async function(req, res) {
 }
 
 exports.dislike = async function(req, res) {
-    const token = req.verification;
+    const token = req.verifiedToken;
     const userIndex = token.userIndex;
     const feedIndex = req.params.idx;
 
@@ -142,7 +139,7 @@ exports.dislike = async function(req, res) {
 }
 
 exports.postComment = async function(req, res) {
-    const token = req.verification;
+    const token = req.verifiedToken;
     const userIndex = token.userIndex;
     const feedIndex = req.params.idx;
 
@@ -159,7 +156,7 @@ exports.postComment = async function(req, res) {
 }
 
 exports.putComment = async function(req, res) {
-    const token = req.verification;
+    const token = req.verifiedToken;
     const userIndex = token.userIndex;
     const feedIndex = req.params.idx;
 
@@ -176,7 +173,7 @@ exports.putComment = async function(req, res) {
 }
 
 exports.deleteComment = async function(req, res) {
-    const token = req.verification;
+    const token = req.verifiedToken;
     const userIndex = token.userIndex;
     const feedIndex = req.params.idx;
 
