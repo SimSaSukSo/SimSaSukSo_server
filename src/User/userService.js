@@ -80,3 +80,20 @@ exports.updatePrfileUrl = async function(profileUrl, userIndex) {
         return errResponse(baseResponse.DB_ERROR);
     }
 }
+
+exports.deleteUser = async function(userIndex) {
+    try {
+        const connection = await pool.getConnection(async (conn) => conn);
+        
+        const deleteUserResult1 = await userDao.deleteUser1(connection, userIndex);
+        const deleteUserResult2 = await userDao.deleteUser2(connection, userIndex);
+        const deleteUserResult3 = await userDao.deleteUser3(connection, userIndex);
+        const deleteUserResult4 = await userDao.deleteUser4(connection, userIndex);
+
+        connection.release();
+        return response(baseResponse.SUCCESS);
+    } catch (err) {
+        logger.error(`App - deleteUser Service error\n: ${err.message}`);
+        return errResponse(baseResponse.DB_ERROR);
+    }
+}

@@ -16,4 +16,6 @@ module.exports = function(app){
     app.post('/api/users/apple/callback', user.appleLoginCallback);
 
     app.put('/api/users/profileUrl', jwtMiddleware, user.setProfileUrl);
+
+    app.delete('/api/users', jwtMiddleware, user.deleteUser);
 };
