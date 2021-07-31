@@ -292,3 +292,24 @@ exports.setNickname = async function (req, res) {
 exports.appleLoginCallback = async function (req, res) {
     return res.status(200).json();
 }
+
+
+exports.setProfileUrl = async function(req, res) {
+    let { profileUrl } = req.body;
+
+    const token = req.verifiedToken;
+    const userIndex = token.userIndex;
+
+    if(!profileUrl) {
+        return res.json(errResponse(baseResponse.PROFILEURL_EMPTY));
+    }
+
+    try {
+        const updateProfileUrlResult = await userService.updatePrfileUrl(profileUrl, userIndex);
+        return res.send(response(baseResponse.SUCCESS));
+    } catch (err) {
+        console.log(err);
+        logger.error(`프로필 사진 변경 중 Error`);
+        return res.json(errResponse(baseResponse.DB_ERROR));
+    }
+}

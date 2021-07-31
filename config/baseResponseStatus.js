@@ -39,6 +39,8 @@ module.exports = {
 
     USER_STATUS_EMPTY : { "isSuccess": false, "code": 2018, "message": "회원 상태값을 입력해주세요" },
 
+    PROFILEURL_EMPTY : { "isSuccess": false, "code": 2019, "message": "변경할 프로필 사진을 입력해주세요" },
+
     SEARCH_LOCATION_EMPTY : { "isSuccess": false, "code": 2020, "message": "검색을 위해 지역을 입력해주세요" },
     INTERVAL_INVALID : { "isSuccess": false, "code": 2021, "message": "올바른 기간을 입력해주세요" },
 
