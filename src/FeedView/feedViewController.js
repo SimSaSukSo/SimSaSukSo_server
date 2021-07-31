@@ -115,8 +115,7 @@ exports.getSearch = async function (req, res) {
 exports.like = async function(req, res) {
     const token = req.verification;
     const userIndex = token.userIndex;
-
-    const {feedIndex} = req.body;
+    const feedIndex = req.params.idx;
 
     try {
         const feedLikeResult = await feedViewProvider.feedLike(userIndex, feedIndex);
@@ -131,8 +130,7 @@ exports.like = async function(req, res) {
 exports.dislike = async function(req, res) {
     const token = req.verification;
     const userIndex = token.userIndex;
-
-    const {feedIndex} = req.body;
+    const feedIndex = req.params.idx;
 
     try {
         const feedUnLikeResult = await feedViewProvider.feedDislike(userIndex, feedIndex);
