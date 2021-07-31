@@ -191,3 +191,43 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
 
     return unlikeResult;
   }
+
+  exports.searchLodging = async function(lodgings) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    
+    const lodgingResult = await feedViewDao.getSearchLodgingD(connection, lodgings);
+
+    connection.release();
+
+    return lodgingResult;
+  }
+
+  exports.searchLodging2 = async function(lodgingIndex) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    
+    const lodgingResult = await feedViewDao.getSearchLodgingDT(connection, lodgingIndex);
+
+    connection.release();
+
+    return lodgingResult;
+  }
+
+  exports.searchTag = async function(tag) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    
+    const tagResult = await feedViewDao.getSearchTagD(connection, tag);
+
+    connection.release();
+
+    return tagResult;
+  }
+
+  exports.searchTag2 = async function(tag) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    
+    const tagResult = await feedViewDao.getSearchTagDT(connection, tag);
+
+    connection.release();
+
+    return tagResult;
+  }

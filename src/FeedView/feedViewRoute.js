@@ -26,6 +26,16 @@ module.exports = function(app){
     // 댓글 삭제 API
     app.delete('/api/feeds/:idx/comments', jwtMiddleware, feedView.deleteComment);
 
+    app.post('/api/feeds/search/lodging', jwtMiddleware, feedView.getSearchLodging);
+
+    app.get('/api/feeds/search/lodging/:idx', jwtMiddleware, feedView.getSearchLodging2);
+
+    app.post('/api/feeds/search/tag', jwtMiddleware, feedView.getSearchTag);
+
+    app.get('/api/feeds/search/tag', jwtMiddleware, feedView.getSearchTag2);
+
+    app.get('/api/feeds/search/total', jwtMiddleware, feedView.getSearchTotal);
+
     // jwt를 사용하기 위해 jwtMiddleware 를 체이닝 방식으로 추가하는 예제
     // app.get('/app/users/:userId', jwtMiddleware, user.getUserById);
 

@@ -747,6 +747,78 @@ async function deleteFeedComment(connection, deleteParams) {
     return deleteComment
 }
 
+async function getSearchLodgingD(connection, lodgings) {
+
+    const stringq = "'%" + lodgings + "%'";
+
+    const searchQuery = `
+    SELECT generalLodgingIndex,
+        name,
+        locationIndex,
+        address
+    FROM GeneralLodging
+    WHERE name LIKE ` + stringq;
+
+    const [lodgingsResult] = await connection.query(searchQuery);
+    return lodgingsResult
+}
+
+async function getSearchLodgingDT(connection, lodgingIndex) {
+
+    const searchQuery = `
+    SELECT FeedImage.feedIndex,
+        FeedImage.feedImageIndex,
+        FeedImage.source
+    FROM FeedImage
+    INNER JOIN(
+    SELECT feedIndex
+    FROM Feed
+    WHERE lodgingType = 1
+    and lodgingIndex = ?
+    ) Feeds
+    WHERE Feeds.feedIndex = FeedImage.feedIndex and
+        FeedImage.uploadOrder = 1;
+    `
+
+    const [lodgingsResult] = await connection.query(searchQuery, lodgingIndex);
+    return lodgingsResult
+}
+
+async function getSearchTagD(connection, tag) {
+
+    const stringq = "'%" + tag + "%'";
+
+    const searchQuery = `
+    SELECT HashTag.keyword
+    FROM HashTag
+    WHERE keyword LIKE ` + stringq;
+
+    const [tagResult] = await connection.query(searchQuery);
+    return tagResult
+}
+
+async function getSearchTagDT(connection, tag) {
+
+    const stringq = "'%" + tag + "%'";
+
+    const searchQuery = `
+    SELECT FeedImage.feedIndex,
+        FeedImage.feedImageIndex,
+        FeedImage.source
+    FROM FeedImage
+    INNER JOIN(
+    SELECT FeedTag.feedIndex
+    FROM HashTag, FeedTag
+    WHERE keyword LIKE ` + stringq + `and
+        FeedTag.hashTagIndex = HashTag.hashTagIndex
+    ) Feeds
+    WHERE Feeds.feedIndex = FeedImage.feedIndex and
+        FeedImage.uploadOrder = 1;`;
+
+    const [tagResult] = await connection.query(searchQuery);
+    return tagResult
+}
+
 module.exports = {
     selectImageList,
     selectLike,
@@ -773,5 +845,9 @@ module.exports = {
     postFeedComment,
     putFeedComment,
     deleteFeedComment,
+    getSearchLodgingD,
+    getSearchLodgingDT,
+    getSearchTagD,
+    getSearchTagDT,
 };
   

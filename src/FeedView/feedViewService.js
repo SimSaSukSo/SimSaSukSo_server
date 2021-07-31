@@ -45,7 +45,7 @@ exports.feedPutComment = async function(content, userIndex, commentIndex, feedIn
     }
 };
 
-exports.feedDeleteComment = async function(userIndex, commentIndex, feedIndex) {
+exports.feedDeleteComment = async function(userIndex, commentIndex, feedIndex) {d
     try {
         const connection = await pool.getConnection(async (conn) => conn);
         
