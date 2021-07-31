@@ -67,3 +67,16 @@ exports.setNickname = async function(nickname, kakaoId) {
         return errResponse(baseResponse.DB_ERROR);
     }
 };
+
+exports.updatePrfileUrl = async function(profileUrl, userIndex) {
+    try {
+        const connection = await pool.getConnection(async (conn) => conn);
+        const insertUserInfoParams = [profileUrl, userIndex];
+        const updateUserProfileResult = await userDao.updateUserProfile(connection, insertUserInfoParams);
+        connection.release();
+        return response(baseResponse.SUCCESS);
+    } catch (err) {
+        logger.error(`App - setUserProfile Service error\n: ${err.message}`);
+        return errResponse(baseResponse.DB_ERROR);
+    }
+}

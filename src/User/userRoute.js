@@ -14,4 +14,6 @@ module.exports = function(app){
     // 3. 애플 로그인/ 회원가입
     app.post('/api/users/appleLogin', user.appleLogin);
     app.post('/api/users/apple/callback', user.appleLoginCallback);
+
+    app.put('/api/users/profileUrl', jwtMiddleware, user.setProfileUrl);
 };

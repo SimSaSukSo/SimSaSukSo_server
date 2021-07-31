@@ -73,6 +73,17 @@ async function updateUserNickname(connection, insertUserInfoParams) {
   return updateUserNicknameRow
 }
 
+async function updateUserProfile(connection, params) {
+  const updateUserProfileUrlQuery = `
+    UPDATE User SET avatarUrl = ? WHERE userIndex = ?;
+  `;
+  const updateUserNicknameRow = await connection.query(
+    updateUserProfileUrlQuery,
+    params
+  );
+  return updateUserNicknameRow
+}
+
 // ---------------------------------------------
 
 module.exports = {
@@ -82,4 +93,5 @@ module.exports = {
   insertUserInfoByApple,
   updateUserNickname,
   selectUserApple,
+  updateUserProfile,
 };
