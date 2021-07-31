@@ -9,13 +9,13 @@ module.exports = function(app){
     app.get('/api/feeds/:idx/comments', jwtMiddleware, feedView.getComment);
 
     // 4. 피드 검색 API
-    app.get('/api/feeds/search/origin', jwtMiddleware, feedView.getSearch);
+    app.post('/api/feeds/search/origin', jwtMiddleware, feedView.getSearch);
 
     // 피드 좋아요 API
-    app.post('/api/feeds/like', jwtMiddleware, feedView.like);
+    app.post('/api/feeds/:idx/like', jwtMiddleware, feedView.like);
 
     // 피드 좋아요 취소 API
-    app.post('/api/feeds/dislike', jwtMiddleware, feedView.dislike);
+    app.post('/api/feeds/:idx/dislike', jwtMiddleware, feedView.dislike);
 
     // 댓글 작성 API
     app.post('/api/feeds/:idx/comments', jwtMiddleware, feedView.postComment);
