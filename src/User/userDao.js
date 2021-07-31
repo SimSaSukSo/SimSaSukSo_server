@@ -24,7 +24,7 @@ async function selectUserApple(connection, appleId) {
   const selectAppleQuery = `
                   SELECT userIndex, email, nickname
                   FROM User
-                  WHERE apple = ?;
+                  WHERE appleId = ?;
   `;
   const [appleRow] = await connection.query(selectAppleQuery, appleId);
   return appleRow;
