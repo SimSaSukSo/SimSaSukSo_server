@@ -313,3 +313,17 @@ exports.setProfileUrl = async function(req, res) {
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
+
+exports.deleteUser= async function(req, res) {
+    const token = req.verifiedToken;
+    const userIndex = token.userIndex;
+
+    try {
+        const updateProfileUrlResult = await userService.deleteUser(userIndex);
+        return res.send(response(baseResponse.SUCCESS));
+    } catch (err) {
+        console.log(err);
+        logger.error(`사용자 삭제 중 Error`);
+        return res.json(errResponse(baseResponse.DB_ERROR));
+    }
+}

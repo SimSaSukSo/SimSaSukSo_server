@@ -84,6 +84,50 @@ async function updateUserProfile(connection, params) {
   return updateUserNicknameRow
 }
 
+async function deleteUser1(connection, userIndex) {
+  const deleteUserQuery = `
+    DELETE FROM User WHERE userIndex = ?;
+  `;
+  const deleteUserRow = await connection.query(
+    deleteUserQuery,
+    userIndex
+  );
+  return deleteUserRow
+}
+
+async function deleteUser2(connection, userIndex) {
+  const deleteUserQuery = `
+    DELETE FROM SavedList WHERE userIndex = ?;
+  `;
+  const deleteUserRow = await connection.query(
+    deleteUserQuery,
+    userIndex
+  );
+  return deleteUserRow
+}
+
+async function deleteUser3(connection, userIndex) {
+  const deleteUserQuery = `
+    DELETE FROM Reliability WHERE userIndex = ?;
+  `;
+  const deleteUserRow = await connection.query(
+    deleteUserQuery,
+    userIndex
+  );
+  return deleteUserRow
+}
+
+async function deleteUser4(connection, userIndex) {
+  const deleteUserQuery = `
+    DELETE FROM Feed WHERE userIndex = ?;
+  `;
+  const deleteUserRow = await connection.query(
+    deleteUserQuery,
+    userIndex
+  );
+  return deleteUserRow
+}
+
 // ---------------------------------------------
 
 module.exports = {
@@ -94,4 +138,8 @@ module.exports = {
   updateUserNickname,
   selectUserApple,
   updateUserProfile,
+  deleteUser1,
+  deleteUser2,
+  deleteUser3,
+  deleteUser4,
 };
