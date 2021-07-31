@@ -188,3 +188,86 @@ exports.deleteComment = async function(req, res) {
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
+
+exports.getSearchLodging = async function(req, res) {
+    const token = req.verifiedToken;
+    const userIndex = token.userIndex;
+
+    const {lodgings} = req.body;
+
+    try {
+        const searchLodging = await feedViewProvider.searchLodging(lodgings);
+        return res.send(response(baseResponse.SUCCESS, searchLodging));
+    } catch (err) {
+        console.log(err);
+        console.log('숙소 검색 API 중 에러');
+        return res.json(errResponse(baseResponse.DB_ERROR));
+    }
+}
+
+exports.getSearchLodging2 = async function(req, res) {
+    const token = req.verifiedToken;
+    const userIndex = token.userIndex;
+    const lodgingIndex = req.params.idx;
+
+    try {
+        const searchLodgingResult = await feedViewProvider.searchLodging2(lodgingIndex);
+        return res.send(response(baseResponse.SUCCESS, searchLodgingResult));
+    } catch (err) {
+        console.log(err);
+        console.log('숙소 검색 API 중 에러');
+        return res.json(errResponse(baseResponse.DB_ERROR));
+    }
+}
+
+exports.getSearchTag = async function(req, res) {
+    const token = req.verifiedToken;
+    const userIndex = token.userIndex;
+    const {tag} = req.body;
+
+    try {
+        const searchTagResult = await feedViewProvider.searchTag(tag);
+        return res.send(response(baseResponse.SUCCESS, searchTagResult));
+    } catch (err) {
+        console.log(err);
+        console.log('태그 검색 API 중 에러');
+        return res.json(errResponse(baseResponse.DB_ERROR));
+    }
+}
+
+exports.getSearchTag2 = async function(req, res) {
+    const token = req.verifiedToken;
+    const userIndex = token.userIndex;
+    const {tag} = req.query;
+
+    try {
+        const searchTagResult = await feedViewProvider.searchTag2(tag);
+        return res.send(response(baseResponse.SUCCESS, searchTagResult));
+    } catch (err) {
+        console.log(err);
+        console.log('태그 검색 API 중 에러');
+        return res.json(errResponse(baseResponse.DB_ERROR));
+    }
+}
+
+exports.getSearchTotal = async function(req, res) {
+    const token = req.verifiedToken;
+    const userIndex = token.userIndex;
+    const {searchWord} = req.query;
+
+    try {
+        const searchLodging = await feedViewProvider.searchLodging(searchWord);
+        const searchTagResult = await feedViewProvider.searchTag(searchWord);
+
+        const result = {
+            "lodging": searchLodging,
+            "tag": searchTagResult
+        }
+
+        return res.send(response(baseResponse.SUCCESS, result));
+    } catch (err) {
+        console.log(err);
+        console.log('전체 검색 API 중 에러');
+        return res.json(errResponse(baseResponse.DB_ERROR));
+    }
+}
