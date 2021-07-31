@@ -131,34 +131,22 @@ async function selectLodgingInfo(connection, feedParams) {
 
 async function selectFeedComment(connection, feedCommentParams) {
     const selectFeedCommentQuery = `
-     SELECT COMLIKE.commentIndex,
-            COMLIKE.userIndex,
-            COMLIKE.nickname,
-            COMLIKE.avatarUrl,
-            COMLIKE.content,
-            COMLIKE.createdAt,
-            COMLIKE.updatedAt,
-            count(CommentLike.commentIndex) as likeNum
-        FROM CommentLike
-        INNER JOIN(
-        SELECT Comment.commentIndex,
-            Comment.userIndex,
-            User.nickname,
-            User.avatarUrl,
-            Comment.content,
-            Comment.createdAt,
-            Comment.updatedAt
-        FROM CommentLike, Comment, User
-        WHERE (Comment.feedIndex = ? and
-            Comment.userIndex = User.userIndex) or
-            (Comment.feedIndex = ? and
-            Comment.commentIndex = CommentLike.commentIndex and
-            CommentLike.status = 'like' and
-            Comment.userIndex = User.userIndex)
-        GROUP BY Comment.commentIndex
-        ) COMLIKE
-        WHERE CommentLike.commentIndex = COMLIKE.commentIndex
-        GROUP BY CommentLike.commentIndex;
+    SELECT Comment.commentIndex,
+        Comment.userIndex,
+        User.nickname,
+        User.avatarUrl,
+        Comment.content,
+        Comment.createdAt,
+        Comment.updatedAt,
+        0 as likeNum
+    FROM CommentLike, Comment, User
+    WHERE (Comment.feedIndex = ? and
+        Comment.userIndex = User.userIndex) or
+        (Comment.feedIndex = ? and
+        Comment.commentIndex = CommentLike.commentIndex and
+        CommentLike.status = 'like' and
+        Comment.userIndex = User.userIndex)
+    GROUP BY Comment.commentIndex;
                 `;
     const [feedCommentInfoRow] = await connection.query(selectFeedCommentQuery, feedCommentParams);
     return feedCommentInfoRow;
