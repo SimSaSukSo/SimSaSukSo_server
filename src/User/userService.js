@@ -40,23 +40,15 @@ exports.kakaoCreateUser = async function (nickname, kaokaoId, avartarUrl, email)
 // 애플 회원가입
 exports.appleCreateUser = async function (nickname, appleId, email) {
     try {
-         // 기존 회원인지 확인
-         const connection = await pool.getConnection(async (conn) => conn);
-         const emailResult = await userDao.selectUserEmail(connection, email);
-         connection.release();
+        const insertUserInfoParams = [nickname, appleId, email];
 
-         const insertUserInfoParams = [nickname, appleId, email];
-
-        // 가입된 회원이 없는 경우
-        if(!emailResult[0]){
-            //회원가입
-            const connection = await pool.getConnection(async (conn) => conn);
-            const signUpResult = await userDao.insertUserInfo(connection, insertUserInfoParams);
-            connection.release();
-            return response(baseResponse.SUCCESS);
-        } 
+        //회원가입
+        const connection = await pool.getConnection(async (conn) => conn);
+        const signUpResult = await userDao.insertUserInfoByApple(connection, insertUserInfoParams);
+        connection.release();
+        return response(baseResponse.SUCCESS);
     } catch (err) {
-        logger.error(`App - kakaoCreateUser Service error\n: ${err.message}`);
+        logger.error(`App - appleCreateUser Service error\n: ${err.message}`);
         return errResponse(baseResponse.DB_ERROR);
     }
 };

@@ -7,11 +7,12 @@ const axios = require("axios");
 const regexEmail = require("regex-email");
 const {emit} = require("nodemon");
 const jwt = require("jsonwebtoken");
+const path = require('path');
 const AppleAuth = require('apple-auth');
 const secret_config = require("../../config/secret");
 const appleAuthConfig = require("../../config/appleAuthConfig");
 
-const apple = new AppleAuth(appleAuthConfig, '../../config/appleAuthKey/AuthKey_AB12CD123E.p8');
+const apple = new AppleAuth(appleAuthConfig, path.join(__dirname,'../../config/appleAuthKey/AuthKey_Y7C7V8VTBJ.p8'));
 
 /**
  * API No. 1
@@ -51,7 +52,7 @@ const apple = new AppleAuth(appleAuthConfig, '../../config/appleAuthKey/AuthKey_
             const userResult = await userProvider.retrieveUser(email);
 
             // 이미 회원가입된 유저일 경우
-            if(userResult.length != 0) {
+            if(userResult != null && userResult != undefined && userResult.length != 0) {
                 try {
                     let userIndex = userResult[0].userIndex;
                     // 회원가입 시 토큰 생성
@@ -203,25 +204,25 @@ exports.setNickname = async function (req, res) {
  */
  exports.appleLogin = async function (req, res) {
     /**
-     * Body: accessToken
+     * Body: code
      */
-    const accessToken = req.body.accessToken;
-    let email, nickname;
-    let appleId = accessToken;
-    
-    if(!accessToken)
-        return res.send(errResponse(baseResponse.ACCESSTOKEN_EMPTY));
-    
+
+    let { appleId, email, nickname } = req.body;
+
+    if(!appleId)
+        return res.send(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+
     try {
         const loginAgainResult = response(baseResponse.LOGIN_SUCCESS);
-        const userResult = await userProvider.retrieveUserByApple(appleId);
-
+        const userResult = await userProvider.retrieveUserByAppleId(appleId);
+        
         // 이미 회원가입된 유저일 경우
-        if(userResult.length != 0) {
+        if (userResult != null && userResult != undefined && userResult.length != 0) {
             try {
-                const userIndex = userResult[0].userIndex;
-                const email = userResult[0].email;
-                const nickname = userResult[0].nickname;
+
+                const userIndex = userResult.userIndex;
+                const email = userResult.email;
+                const nickname = userResult.nickname;
 
                 // 회원가입 시 토큰 생성
                 let token = await jwt.sign(
@@ -251,15 +252,13 @@ exports.setNickname = async function (req, res) {
             }
         }
 
-
-        /// 여기서부터 작업
-        // 애플은 이름, 이메일, 얻어내고
-        // email = dsadasd;
-        // nickname = dasadsa;
+        // 애플 회원가입
+        if (!email || !nickname)
+            return res.send(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
 
         const result = await userService.appleCreateUser(nickname, appleId, email);
-        const newUserResult = await userProvider.retrieveUser(email);
-        let userIndex = newUserResult[0].userIndex;
+        const newUserResult = await userProvider.retrieveUserByAppleId(appleId);
+        let userIndex = newUserResult.userIndex;
 
         // 회원가입 시 토큰 생성
         let token = await jwt.sign(
@@ -289,3 +288,7 @@ exports.setNickname = async function (req, res) {
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 };
+
+exports.appleLoginCallback = async function (req, res) {
+    return res.status(200).json();
+}
