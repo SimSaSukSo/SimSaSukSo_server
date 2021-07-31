@@ -1,14 +1,15 @@
 const jwt = require('jsonwebtoken');
 const secret_config = require('./secret');
-const baseResponse = require("./baseResponseStatus");
-const {response, errResponse} = require("./response");
-
 const jwtMiddleware = (req, res, next) => {
     // read the token from header or url
     const token = req.headers['x-access-token'] || req.query.token;
     // token does not exist
     if(!token) {
-        return res.json(errResponse(baseResponse.TOKEN_EMPTY));
+        return res.status(403).json({
+            isSuccess:false,
+            code: 403,
+            message: '로그인이 되어 있지 않습니다.'
+        });
     }
 
     // create a promise that decodes the token
@@ -23,7 +24,11 @@ const jwtMiddleware = (req, res, next) => {
 
     // if it has failed to verify, it will return an error message
     const onError = (error) => {
-        return res.json(errResponse(baseResponse.TOKEN_VERIFICATION_FAILURE))
+        res.status(403).json({
+            isSuccess:false,
+            code: 403,
+            message:"검증 실패"
+        });
     };
 
     // process the promise
