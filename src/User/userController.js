@@ -72,6 +72,7 @@ const apple = new AppleAuth(appleAuthConfig, path.join(__dirname,'../../config/a
 
                     // 토큰 생성 성공
                     if (token) {
+                        
                         loginAgainResult.token = token;
                         return res.send(loginAgainResult);
                     }
@@ -104,11 +105,8 @@ const apple = new AppleAuth(appleAuthConfig, path.join(__dirname,'../../config/a
             
             // 토큰 생성 성공
             if (token) {
-                const tokenRes = {
-                    result,
-                    "token": token
-                };
-                return res.send(tokenRes);
+                result.token = token
+                return res.send(result);
             }
 
         }).catch(function (error) {
