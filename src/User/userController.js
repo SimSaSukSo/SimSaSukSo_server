@@ -319,8 +319,18 @@ exports.deleteUser= async function(req, res) {
     const userIndex = token.userIndex;
 
     try {
-        const updateProfileUrlResult = await userService.deleteUser(userIndex);
-        return res.send(response(baseResponse.SUCCESS));
+        if(!userIndex) {
+            return res.json(errResponse(baseResponse.USER_USERID_EMPTY));
+        }
+
+        const selectUserResult = await userProvider.retrieveUserByuserIndex(userIndex);
+
+        if(!selectUserResult) {
+            return res.json(errResponse(baseResponse.USER_USERID_NOT_EXIST));
+        } else {
+            const updateProfileUrlResult = await userService.deleteUser(userIndex);
+            return res.send(response(baseResponse.SUCCESS));
+        }
     } catch (err) {
         console.log(err);
         logger.error(`사용자 삭제 중 Error`);

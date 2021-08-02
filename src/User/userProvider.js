@@ -29,3 +29,11 @@ exports.retrieveUserByAppleId = async function(appleId) {
 
   return appleResult;
 };
+
+exports.retrieveUserByuserIndex = async function(userIndex) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  const [userResult] = await userDao.selectUserId(connection, userIndex);
+  connection.release();
+
+  return userResult;
+}

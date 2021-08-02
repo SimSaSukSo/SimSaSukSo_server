@@ -10,6 +10,16 @@ async function selectUserEmail(connection, email) {
   return userRow;
 }
 
+async function selectUserId(connection, userIndex) {
+  const selectUserIdQuery = `
+                 SELECT *
+                 FROM User 
+                 WHERE userIndex = ?;
+                 `;
+  const [userRow] = await connection.query(selectUserIdQuery, userIndex);
+  return userRow;
+}
+
 async function selectUserNickname(connection, nickname) {
   const selectNicknameQuery = `
                   SELECT nickname
@@ -142,4 +152,5 @@ module.exports = {
   deleteUser2,
   deleteUser3,
   deleteUser4,
+  selectUserId,
 };
