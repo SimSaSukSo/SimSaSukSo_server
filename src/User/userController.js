@@ -274,11 +274,9 @@ exports.setNickname = async function (req, res) {
         );
         // 토큰 생성 성공
         if (token) {
-            const tokenRes = {
-                result,
-                "token": token
-            };
-            return res.send(tokenRes);
+            let joinResult = response(baseResponse.SUCCESS);
+            joinResult.token = token;
+            return res.send(joinResult);
         }
     } catch (err) {
         console.log(err);
