@@ -66,15 +66,18 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
     delete feedInfo.hashTags;
 
     let prosAndCons;
-    if (proscons[0] && proscons[1]) {
-      prosAndCons = { "cons": proscons[0]["keyword"], "pros": proscons[1]["keyword"]};
+    if(proscons.length > 0) {
+      if (proscons[0] && proscons[1]) {
+        prosAndCons = { "cons": proscons[0]["keyword"], "pros": proscons[1]["keyword"]};
+      }
+      else if(proscons[0] && proscons[0]["status"] == "pros") {
+        prosAndCons = { "pros": proscons[0]["keyword"]};
+      }
+      else {
+        prosAndCons = { "cons": proscons[0]["keyword"]};
+      }
     }
-    else if(proscons[0] && proscons[0]["status"] == "pros") {
-      prosAndCons = { "pros": proscons[0]["keyword"]};
-    }
-    else {
-      prosAndCons = { "cons": proscons[0]["keyword"]};
-    }
+    
 
     connection.release();
 
