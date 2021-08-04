@@ -51,6 +51,12 @@ const apple = new AppleAuth(appleAuthConfig, path.join(__dirname,'../../config/a
 
             const userResult = await userProvider.retrieveUser(email);
 
+            const [userStatus] = await userProvider.retrieveKakaoStatus(email);
+
+            if(userStatus.status == 'suspended') {
+                return res.json(errResponse(baseResponse.USER_SUSPENDED));
+            }
+
             // 이미 회원가입된 유저일 경우
             if(userResult != null && userResult != undefined && userResult.length != 0) {
                 try {
@@ -213,6 +219,12 @@ exports.setNickname = async function (req, res) {
     try {
         const loginAgainResult = response(baseResponse.LOGIN_SUCCESS);
         const userResult = await userProvider.retrieveUserByAppleId(appleId);
+
+        const [userStatus] = await userProvider.retrieveAppleStatus(appleId);
+
+        if(userStatus.status == 'suspended') {
+            return res.json(errResponse(baseResponse.USER_SUSPENDED));
+        }
         
         // 이미 회원가입된 유저일 경우
         if (userResult != null && userResult != undefined && userResult.length != 0) {

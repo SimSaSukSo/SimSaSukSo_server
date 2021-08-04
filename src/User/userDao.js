@@ -138,6 +138,26 @@ async function deleteUser4(connection, userIndex) {
   return deleteUserRow
 }
 
+async function selectUserStatus1(connection, email) {
+  const selectUserIdQuery = `
+    SELECT status
+    FROM User
+    WHERE email = ?;
+                 `;
+  const [statusRow] = await connection.query(selectUserIdQuery, email);
+  return statusRow;
+}
+
+async function selectUserStatus2(connection, appleId) {
+  const selectAppleQuery = `
+    SELECT status
+    FROM User
+    WHERE appleId = ?;
+  `;
+  const [statusRow] = await connection.query(selectAppleQuery, appleId);
+  return statusRow;
+}
+
 // ---------------------------------------------
 
 module.exports = {
@@ -153,4 +173,6 @@ module.exports = {
   deleteUser3,
   deleteUser4,
   selectUserId,
+  selectUserStatus1,
+  selectUserStatus2,
 };

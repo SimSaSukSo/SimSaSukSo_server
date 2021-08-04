@@ -66,6 +66,8 @@ module.exports = {
 
     KAKAOUSER_REDUNDANT : {"isSuccess": false, "code": 3007, "message": "이미 가입된 유저입니다. 바로 로그인해주세요." },
 
+    USER_SUSPENDED : {"isSuccess": false, "code": 3008, "message": "정지된 계정입니다. 관리자에게 문의하세요." },
+
     FEED_EMPTY : {"isSuccess": false, "code": 3010, "message": "피드 정보가 존재하지 않습니다." },
     FEED_COMMENT_EMPTY : {"isSuccess": false, "code": 3011, "message": "피드 댓글 정보가 존재하지 않습니다." },
 

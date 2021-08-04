@@ -37,3 +37,21 @@ exports.retrieveUserByuserIndex = async function(userIndex) {
 
   return userResult;
 }
+
+exports.retrieveKakaoStatus = async function(email) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  const userStatusResult = await userDao.selectUserStatus1(connection, email);
+
+  connection.release();
+
+  return userStatusResult;
+}
+
+exports.retrieveAppleStatus = async function(appleId) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  const userStatusResult = await userDao.selectUserStatus2(connection, appleId);
+
+  connection.release();
+
+  return userStatusResult;
+}
