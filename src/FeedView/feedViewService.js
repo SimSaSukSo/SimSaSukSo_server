@@ -66,6 +66,7 @@ exports.feedDeleteComment = async function(userIndex, commentIndex, feedIndex) {
 exports.feedReport = async function(userIndex, feedIndex) {
     try {
         const connection = await pool.getConnection(async (conn) => conn);
+
         let userIndex_to;
 
         const [userIndex_to_] = await feedViewDao.selectUserIndex_to(connection, feedIndex);
