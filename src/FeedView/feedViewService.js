@@ -10,6 +10,7 @@ const {errResponse} = require("../../config/response");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const {connect} = require("http2");
+const { USER_ID_NOT_MATCH, LOGIN_SUCCESS } = require("../../config/baseResponseStatus");
 
 // Service: Create, Update, Delete 비즈니스 로직 처리
 
@@ -65,11 +66,23 @@ exports.feedDeleteComment = async function(userIndex, commentIndex, feedIndex) {
 exports.feedReport = async function(userIndex, feedIndex) {
     try {
         const connection = await pool.getConnection(async (conn) => conn);
-        const params = [userIndex, feedIndex];
+
+        let userIndex_to;
+
+        const [userIndex_to_] = await feedViewDao.selectUserIndex_to(connection, feedIndex);
+        if(userIndex_to_) {
+            userIndex_to = userIndex_to_.userIndex;
+        } else {
+            return errResponse(baseResponse.FEED_EMPTY);
+        }
+        
+
+        const params = [userIndex, feedIndex, userIndex_to];
+        const params_ = [userIndex, feedIndex];
 
         const isExistFeed = await feedViewDao.selectFeed(connection, feedIndex);
 
-        const reportCount = await feedViewDao.selectUserFeedReport(connection, params);
+        const reportCount = await feedViewDao.selectUserFeedReport(connection, params_);
 
         if (isExistFeed.length == 0) {
             return errResponse(baseResponse.FEED_EMPTY);
@@ -78,6 +91,13 @@ exports.feedReport = async function(userIndex, feedIndex) {
             return errResponse(baseResponse.FEEDREPORT_REDUNDANT);
         } else {
             const reportFeedResult = await feedViewDao.reportFeed(connection, params);
+
+            const userReportFeedCount = await feedViewDao.selectUserReportFeedCount(connection, userIndex_to);
+
+            if(userReportFeedCount.length >= 5) {
+                // user status suspended
+                const suspendUserResult = await feedViewDao.suspendUser(connection, userIndex_to);
+            }
 
             const selectReportResult = await feedViewDao.selectReportFeed(connection, feedIndex);
     

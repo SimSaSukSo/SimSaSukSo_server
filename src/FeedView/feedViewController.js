@@ -274,12 +274,15 @@ exports.getSearchTotal = async function(req, res) {
 
 exports.report = async function(req, res) {
     const token = req.verifiedToken;
-    const userIndex = token.userIndex;
+    let userIndex = token.userIndex;
     const feedIndex = req.params.idx;
 
     try {
         if(!feedIndex) {
             return res.json(errResponse(baseResponse.FEEDINDEX_EMPTY));
+        }
+        if(!userIndex) {
+            return res.json(errResponse(baseResponse.USER_USERID_EMPTY));
         }
         const feedReportResult = await feedViewService.feedReport(userIndex, feedIndex);
         return res.send(feedReportResult);

@@ -827,9 +827,20 @@ async function getSearchTagDT(connection, tag) {
     return tagResult
 }
 
+async function selectUserIndex_to(connection, feedIndex) {
+    const select_to_Query = `
+        SELECT userIndex
+        FROM Feed
+        WHERE feedIndex = ?;
+    `;
+
+    const [user_to_Result] = await connection.query(select_to_Query, feedIndex);
+    return user_to_Result
+}
+
 async function reportFeed(connection, params) {
     const reportQuery = `
-        INSERT INTO FeedReport(userIndex, feedIndex) VALUES (?, ?);
+        INSERT INTO FeedReport(userIndex, feedIndex, userIndex_to) VALUES (?, ?, ?);
     `;
 
     const [reportResult] = await connection.query(reportQuery, params);
@@ -970,6 +981,37 @@ async function selectFeed(connection, feedIndex) {
     return selectFeedResult
 }
 
+async function selectUserReportFeedCount(connection, userIndex) {
+    const selectCountQuery = `
+    SELECT COUNT(*) as userReportFeedCount
+    FROM FeedReport
+    INNER JOIN(
+    SELECT FeedReport.feedIndex,
+           COUNT(feedIndex) as reportCount
+    FROM FeedReport
+    WHERE userIndex_to = ?
+    GROUP BY feedIndex
+    ) FR
+    WHERE FR.feedIndex = FeedReport.feedIndex and
+          FR.reportCount >= 10
+    GROUP BY FeedReport.feedIndex;
+    `;
+
+    const [selectCountResult] = await connection.query(selectCountQuery, userIndex);
+    return selectCountResult;
+}
+
+async function suspendUser(connection, userIndex) {
+    const suspendUserQuery = `
+      UPDATE User SET status = 'suspended' WHERE userIndex = ?;
+    `;
+    const deleteUserRow = await connection.query(
+      suspendUserQuery,
+      userIndex
+    );
+    return deleteUserRow
+  }
+
 
 module.exports = {
     selectImageList,
@@ -1018,5 +1060,8 @@ module.exports = {
     selectFeed,
     selectFeedCommentIndex,
     selectLikeNum,
+    selectUserIndex_to,
+    selectUserReportFeedCount,
+    suspendUser,
 };
   
