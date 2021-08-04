@@ -1012,6 +1012,7 @@ async function suspendUser(connection, userIndex) {
     return deleteUserRow
   }
 
+
 module.exports = {
     selectImageList,
     selectLike,
