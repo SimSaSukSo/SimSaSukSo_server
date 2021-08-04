@@ -271,3 +271,20 @@ exports.getSearchTotal = async function(req, res) {
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
+
+exports.report = async function(req, res) {
+    const token = req.verifiedToken;
+    const userIndex = token.userIndex;
+    const feedIndex = req.params.idx;
+
+    try {
+        if(!feedIndex) {
+            return res.json(errResponse(baseResponse.FEEDINDEX_EMPTY));
+        }
+        const feedReportResult = await feedViewService.feedReport(userIndex, feedIndex);
+        return res.send(feedReportResult);
+    } catch (err) {
+        console.log(err);
+        return res.json(errResponse(baseResponse.DB_ERROR));
+    }
+}

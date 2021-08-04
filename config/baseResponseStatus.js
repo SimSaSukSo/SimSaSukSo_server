@@ -44,6 +44,8 @@ module.exports = {
     SEARCH_LOCATION_EMPTY : { "isSuccess": false, "code": 2020, "message": "검색을 위해 지역을 입력해주세요" },
     INTERVAL_INVALID : { "isSuccess": false, "code": 2021, "message": "올바른 기간을 입력해주세요" },
 
+    FEEDINDEX_EMPTY : { "isSuccess": false, "code": 2022, "message": "피드를 입력해주세요" },
+
     REGION_EMPTY : { "isSuccess": false, "code": 2030, "message": "지역을 입력해주세요." },
 
     // related upload
@@ -71,6 +73,8 @@ module.exports = {
     PAGE_WRONG : { "isSuccess": false, "code": 3031, "message": "유효하지 않은 페이지입니다." },
 
     FEEDBACK_PARAMETER_INVALID : { "isSuccess": false, "code": 3040, "message": "유효하지 않은 숙소" },
+
+    FEEDREPORT_REDUNDANT : { "isSuccess": false, "code": 3050, "message": "이미 신고한 피드입니다." },
 
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},

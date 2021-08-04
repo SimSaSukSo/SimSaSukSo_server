@@ -99,7 +99,19 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
 
     const feedParams = [feedIndex, feedIndex];
 
+    const feedCommentIndex = await feedViewDao.selectFeedCommentIndex(connection, feedIndex);
+
     const feedComment = await feedViewDao.selectFeedComment(connection, feedParams);
+
+    let likeNumResult = [];
+
+    for (var i = 0; i< feedCommentIndex.length; i ++) {
+      [likeNumResult[i]] = await feedViewDao.selectLikeNum(connection, feedCommentIndex[i].commentIndex);
+    }
+
+    for (var i = 0; i< feedComment.length; i ++) {
+      feedComment[i].likeNum = likeNumResult[i].likeNum;
+    }
 
     connection.release();
 
