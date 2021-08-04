@@ -137,8 +137,7 @@ async function selectFeedComment(connection, feedCommentParams) {
         User.avatarUrl,
         Comment.content,
         Comment.createdAt,
-        Comment.updatedAt,
-        0 as likeNum
+        Comment.updatedAt
     FROM CommentLike, Comment, User
     WHERE (Comment.feedIndex = ? and
         Comment.userIndex = User.userIndex) or
@@ -150,6 +149,27 @@ async function selectFeedComment(connection, feedCommentParams) {
                 `;
     const [feedCommentInfoRow] = await connection.query(selectFeedCommentQuery, feedCommentParams);
     return feedCommentInfoRow;
+}
+
+async function selectFeedCommentIndex(connection, feedIndex) {
+    const selectFeedCommentIndexQuery = `
+        SELECT Comment.commentIndex
+        FROM Comment
+        WHERE Comment.feedIndex = ?;
+                `;
+    const [feedCommentIndexRow] = await connection.query(selectFeedCommentIndexQuery, feedIndex);
+    return feedCommentIndexRow;
+}
+
+async function selectLikeNum(connection, commentIndex) {
+    const likeNumQuery = `
+    SELECT count(CommentLike.commentLikeIndex) as likeNum
+    FROM CommentLike
+    WHERE CommentLike.commentIndex = ?;
+    `;
+
+    const [likeNumRow] = await connection.query(likeNumQuery, commentIndex);
+    return likeNumRow;
 }
 
 async function searchFeedYear(connection, params) {
@@ -807,6 +827,150 @@ async function getSearchTagDT(connection, tag) {
     return tagResult
 }
 
+async function reportFeed(connection, params) {
+    const reportQuery = `
+        INSERT INTO FeedReport(userIndex, feedIndex) VALUES (?, ?);
+    `;
+
+    const [reportResult] = await connection.query(reportQuery, params);
+    return reportResult
+}
+
+async function selectReportFeed(connection, feedIndex) {
+    const selectReportQuery = `
+        SELECT feedReportIndex
+        FROM FeedReport
+        WHERE feedIndex = ?;
+    `;
+
+    const [selectReportResult] = await connection.query(selectReportQuery, feedIndex);
+    return selectReportResult
+}
+
+async function deleteReportFeed(connection, feedIndex) {
+    const deleteReportFeedQuery = `
+        DELETE FROM Feed WHERE feedIndex = ?;
+    `;
+
+    const [deleteFeedResult] = await connection.query(deleteReportFeedQuery, feedIndex);
+    return deleteFeedResult
+}
+
+async function deleteReportComment(connection, feedIndex) {
+    const deleteReportCommentQuery = `
+        DELETE FROM Comment WHERE feedIndex = ?;
+    `;
+
+    const [deleteCommentResult] = await connection.query(deleteReportCommentQuery, feedIndex);
+    return deleteCommentResult
+}
+
+async function selectReportComment(connection, feedIndex) {
+    const selectReportCommentQuery = `
+        SELECT commentIndex
+        FROM Comment
+        WHERE feedIndex = ?;
+    `;
+
+    const [selectReportCommentResult] = await connection.query(selectReportCommentQuery, feedIndex);
+    return selectReportCommentResult
+}
+
+async function deleteReportCommentLike(connection, commentIndex) {
+    const deleteReportCommentLikeQuery = `
+        DELETE FROM CommentLike WHERE commentIndex = ?;
+    `;
+
+    const [deleteCommentLikeResult] = await connection.query(deleteReportCommentLikeQuery, commentIndex);
+    return deleteCommentLikeResult
+}
+
+async function deleteReportFeedImage(connection, feedIndex) {
+    const deleteReportFeedImageQuery = `
+        DELETE FROM FeedImage WHERE feedIndex = ?;
+    `;
+
+    const [deleteFeedImageResult] = await connection.query(deleteReportFeedImageQuery, feedIndex);
+    return deleteFeedImageResult
+}
+
+async function deleteReportFeedLike(connection, feedIndex) {
+    const deleteReportFeedLikeQuery = `
+        DELETE FROM FeedLike WHERE feedIndex = ?;
+    `;
+
+    const [deleteFeedLikeResult] = await connection.query(deleteReportFeedLikeQuery, feedIndex);
+    return deleteFeedLikeResult
+}
+
+async function deleteReportFeedProsAndCons(connection, feedIndex) {
+    const deleteReportFeedProsAndConsQuery = `
+        DELETE FROM FeedProsAndCons WHERE feedIndex = ?;
+    `;
+
+    const [deleteFeedProsAndConsResult] = await connection.query(deleteReportFeedProsAndConsQuery, feedIndex);
+    return deleteFeedProsAndConsResult
+}
+
+async function deleteReportFeedTag(connection, feedIndex) {
+    const deleteReportFeedTagQuery = `
+        DELETE FROM FeedTag WHERE feedIndex = ?;
+    `;
+
+    const [deleteFeedTagResult] = await connection.query(deleteReportFeedTagQuery, feedIndex);
+    return deleteFeedTagResult
+}
+
+async function deleteReportFeedTool(connection, feedIndex) {
+    const deleteReportFeedToolQuery = `
+        DELETE FROM FeedTool WHERE feedIndex = ?;
+    `;
+
+    const [deleteFeedToolResult] = await connection.query(deleteReportFeedToolQuery, feedIndex);
+    return deleteFeedToolResult
+}
+
+async function deleteReportReliability(connection, feedIndex) {
+    const deleteReportReliabilityQuery = `
+        DELETE FROM Reliability WHERE feedIndex = ?;
+    `;
+
+    const [deleteReportReliabilityResult] = await connection.query(deleteReportReliabilityQuery, feedIndex);
+    return deleteReportReliabilityResult
+}
+
+async function deleteReportSavedFeed(connection, feedIndex) {
+    const deleteReportSavedFeedQuery = `
+        DELETE FROM SavedFeed WHERE feedIndex = ?;
+    `;
+
+    const [deleteSavedFeedResult] = await connection.query(deleteReportSavedFeedQuery, feedIndex);
+    return deleteSavedFeedResult
+}
+
+async function selectUserFeedReport(connection, params) {
+    const selectUserFeedReportQuery = `
+        SELECT feedReportIndex
+        FROM FeedReport
+        WHERE userIndex = ? and feedIndex = ?;
+    `;
+
+    const [reportCountResult] = await connection.query(selectUserFeedReportQuery, params);
+    return reportCountResult
+}
+
+async function selectFeed(connection, feedIndex) {
+    const selectFeedQuery = `
+        SELECT *
+        FROM Feed
+        WHERE feedIndex = ?;
+    `;
+
+    const [selectFeedResult] = await connection.query(selectFeedQuery, feedIndex);
+    return selectFeedResult
+}
+
+
 module.exports = {
     selectImageList,
     selectLike,
@@ -837,5 +1001,22 @@ module.exports = {
     getSearchLodgingDT,
     getSearchTagD,
     getSearchTagDT,
+    reportFeed,
+    selectReportFeed,
+    deleteReportFeed,
+    deleteReportComment,
+    selectReportComment,
+    deleteReportCommentLike,
+    deleteReportFeedImage,
+    deleteReportFeedLike,
+    deleteReportFeedProsAndCons,
+    deleteReportFeedTag,
+    deleteReportFeedTool,
+    deleteReportReliability,
+    deleteReportSavedFeed,
+    selectUserFeedReport,
+    selectFeed,
+    selectFeedCommentIndex,
+    selectLikeNum,
 };
   
