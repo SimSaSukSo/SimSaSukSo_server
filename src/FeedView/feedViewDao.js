@@ -14,13 +14,16 @@ return imageRow;
 
 async function selectLike(connection, requestParams) {
 const selectLikeQuery = `
-    SELECT count(*) as likeNum,
-        isLike.isLiked
+    SELECT COUNT(*) likeNum,
+    FL.isLiked
     FROM FeedLike
-    INNER JOIN (SELECT IFNULL(count(*), 0) as isLiked
-                    FROM FeedLike
-                    WHERE FeedLike.feedIndex = ? and
-                        FeedLike.userIndex = ?) isLike
+    INNER JOIN(
+    SELECT COUNT(*) as isLiked
+    FROM FeedLike
+    WHERE FeedLike.feedIndex = ? and
+    FeedLike.userIndex = ? and
+    FeedLike.status = 'like'
+    ) FL
     WHERE FeedLike.feedIndex = ?;
             `;
 const [feedLikeRow] = await connection.query(selectLikeQuery, requestParams);
@@ -165,7 +168,8 @@ async function selectLikeNum(connection, commentIndex) {
     const likeNumQuery = `
     SELECT count(CommentLike.commentLikeIndex) as likeNum
     FROM CommentLike
-    WHERE CommentLike.commentIndex = ?;
+    WHERE CommentLike.commentIndex = ? and
+          CommentLike.status = 'like';
     `;
 
     const [likeNumRow] = await connection.query(likeNumQuery, commentIndex);
