@@ -53,13 +53,13 @@ const apple = new AppleAuth(appleAuthConfig, path.join(__dirname,'../../config/a
 
             const [userStatus] = await userProvider.retrieveKakaoStatus(email);
 
-            if(userStatus.status == 'suspended') {
-                return res.json(errResponse(baseResponse.USER_SUSPENDED));
-            }
-
             // 이미 회원가입된 유저일 경우
             if(userResult != null && userResult != undefined && userResult.length != 0) {
                 try {
+                    if(userStatus.status == 'suspended') {
+                        return res.json(errResponse(baseResponse.USER_SUSPENDED));
+                    }
+
                     let userIndex = userResult[0].userIndex;
                     // 회원가입 시 토큰 생성
                     let token = await jwt.sign(
@@ -222,13 +222,13 @@ exports.setNickname = async function (req, res) {
 
         const [userStatus] = await userProvider.retrieveAppleStatus(appleId);
 
-        if(userStatus.status == 'suspended') {
-            return res.json(errResponse(baseResponse.USER_SUSPENDED));
-        }
-        
         // 이미 회원가입된 유저일 경우
         if (userResult != null && userResult != undefined && userResult.length != 0) {
             try {
+
+                if(userStatus.status == 'suspended') {
+                    return res.json(errResponse(baseResponse.USER_SUSPENDED));
+                }
 
                 const userIndex = userResult.userIndex;
                 const email = userResult.email;
