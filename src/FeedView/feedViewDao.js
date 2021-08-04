@@ -15,7 +15,7 @@ return imageRow;
 async function selectLike(connection, requestParams) {
 const selectLikeQuery = `
     SELECT COUNT(*) likeNum,
-    FL.isLiked
+    IFNULL(FL.isLiked, 0) as isLiked
     FROM FeedLike
     INNER JOIN(
     SELECT COUNT(*) as isLiked
@@ -24,7 +24,8 @@ const selectLikeQuery = `
     FeedLike.userIndex = ? and
     FeedLike.status = 'like'
     ) FL
-    WHERE FeedLike.feedIndex = ?;
+    WHERE FeedLike.feedIndex = ? and
+    FeedLike.status = 'like';
             `;
 const [feedLikeRow] = await connection.query(selectLikeQuery, requestParams);
 return feedLikeRow;
