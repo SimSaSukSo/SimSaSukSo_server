@@ -74,7 +74,7 @@ async function updateUserNickname(connection, insertUserInfoParams) {
   const updateUserNicknameQuery = `
         UPDATE User
         SET nickname = ?
-        WHERE kakaoId = ?;
+        WHERE userIndex = ?;
   `;
   const updateUserNicknameRow = await connection.query(
     updateUserNicknameQuery,

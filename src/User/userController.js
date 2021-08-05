@@ -64,9 +64,6 @@ const apple = new AppleAuth(appleAuthConfig, path.join(__dirname,'../../config/a
                     // 회원가입 시 토큰 생성
                     let token = await jwt.sign(
                         {
-                            kakaoId: kakaoId,
-                            nickname: nickname,
-                            email: email,
                             userIndex: userIndex
                         }, // 토큰의 내용(payload)
                         secret_config.jwtsecret, // 비밀키
@@ -97,9 +94,6 @@ const apple = new AppleAuth(appleAuthConfig, path.join(__dirname,'../../config/a
             // 회원가입 시 토큰 생성
             let token = await jwt.sign(
             {
-                kakaoId: kakaoId,
-                nickname: nickname,
-                email: email,
                 userIndex: userIndex
             }, // 토큰의 내용(payload)
             secret_config.jwtsecret, // 비밀키
@@ -149,7 +143,7 @@ exports.setNickname = async function (req, res) {
     const nickname = req.query.nickname;
 
     const token = req.verifiedToken;
-    const kakaoId = token.kakaoId;
+    const userIndex = token.userIndex;
 
     // 닉네임 입력받음
     if (!nickname) {
@@ -185,7 +179,7 @@ exports.setNickname = async function (req, res) {
 
         try {
             // 닉네임 설정
-            const nicknameResponse = await userService.setNickname(nickname, kakaoId);
+            const nicknameResponse = await userService.setNickname(nickname, userIndex);
             return res.send(nicknameResponse);
         } catch (err) {
             logger.error(`닉네임 설정 중 Error\n: ${JSON.stringify(err)}`);
@@ -237,9 +231,6 @@ exports.setNickname = async function (req, res) {
                 // 회원가입 시 토큰 생성
                 let token = await jwt.sign(
                     {
-                        appleId: appleId,
-                        nickname: nickname,
-                        email: email,
                         userIndex: userIndex
                     }, // 토큰의 내용(payload)
                     secret_config.jwtsecret, // 비밀키
@@ -273,9 +264,6 @@ exports.setNickname = async function (req, res) {
         // 회원가입 시 토큰 생성
         let token = await jwt.sign(
         {
-            appleId: appleId,
-            nickname: nickname,
-            email: email,
             userIndex: userIndex
         }, // 토큰의 내용(payload)
         secret_config.jwtsecret, // 비밀키

@@ -55,10 +55,10 @@ exports.appleCreateUser = async function (nickname, appleId, email) {
 
 
 // 닉네임 설정
-exports.setNickname = async function(nickname, kakaoId) {
+exports.setNickname = async function(nickname, userIndex) {
     try {
         const connection = await pool.getConnection(async (conn) => conn);
-        const insertUserInfoParams = [nickname, kakaoId];
+        const insertUserInfoParams = [nickname, userIndex];
         const setNicknameResult = await userDao.updateUserNickname(connection, insertUserInfoParams);
         connection.release();
         return response(baseResponse.SUCCESS);
