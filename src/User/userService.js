@@ -85,10 +85,15 @@ exports.deleteUser = async function(userIndex) {
     try {
         const connection = await pool.getConnection(async (conn) => conn);
         
+        const deleteUserResult0 = await userDao.deleteUser0(connection, userIndex);
         const deleteUserResult1 = await userDao.deleteUser1(connection, userIndex);
         const deleteUserResult2 = await userDao.deleteUser2(connection, userIndex);
         const deleteUserResult3 = await userDao.deleteUser3(connection, userIndex);
         const deleteUserResult4 = await userDao.deleteUser4(connection, userIndex);
+        const deleteUserResult5 = await userDao.deleteUser5(connection, userIndex);
+        const deleteUserResult6 = await userDao.deleteUser6(connection, userIndex);
+        const deleteUserResult7 = await userDao.deleteUser7(connection, userIndex);
+        const deleteUserResult8 = await userDao.deleteUser8(connection, userIndex);
 
         connection.release();
         return response(baseResponse.SUCCESS);
