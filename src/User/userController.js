@@ -74,6 +74,7 @@ const apple = new AppleAuth(appleAuthConfig, path.join(__dirname,'../../config/a
                     if (token) {
                         
                         loginAgainResult.token = token;
+                        logger.info(loginAgainResult);
                         return res.send(loginAgainResult);
                     }
 
