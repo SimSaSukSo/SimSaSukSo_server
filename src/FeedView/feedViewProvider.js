@@ -19,6 +19,7 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
     const proscons = await feedViewDao.selectProsAndCons(connection, feedIndex);
     const [feedInfo] = await feedViewDao.selectFeedInfo(connection, feedParams);
     const [lodgingInfo] = await feedViewDao.selectLodgingInfo(connection, feedParams);
+    const [userInfo] = await feedViewDao.selectUserInfo(connection, feedIndex);
     
     if (correction["correctionToolIndex"]) {
       correction["correctionToolIndex"] = correction["correctionToolIndex"].split(",");
@@ -83,6 +84,7 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
 
 
     const  result = {
+      userInfo,
       feedImage,
       feedLike,
       correction,

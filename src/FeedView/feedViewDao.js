@@ -1017,6 +1017,26 @@ async function suspendUser(connection, userIndex) {
     return deleteUserRow
   }
 
+async function selectUserInfo(connection, feedIndex) {
+    const userInfoQuery = `
+    SELECT User.userIndex,
+        User.nickname,
+        User.avatarUrl
+    FROM User
+    INNER JOIN(
+    SELECT Feed.userIndex
+    FROM Feed
+    WHERE Feed.feedIndex = ?
+    ) FEED
+    WHERE User.userIndex = FEED.userIndex;
+    `;
+    const [userInfoRow] = await connection.query(
+        userInfoQuery,
+        feedIndex
+    );
+    return userInfoRow
+}
+
 
 module.exports = {
     selectImageList,
@@ -1068,5 +1088,6 @@ module.exports = {
     selectUserIndex_to,
     selectUserReportFeedCount,
     suspendUser,
+    selectUserInfo,
 };
   
