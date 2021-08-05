@@ -39,8 +39,12 @@ module.exports = {
 
     USER_STATUS_EMPTY : { "isSuccess": false, "code": 2018, "message": "회원 상태값을 입력해주세요" },
 
+    PROFILEURL_EMPTY : { "isSuccess": false, "code": 2019, "message": "변경할 프로필 사진을 입력해주세요" },
+
     SEARCH_LOCATION_EMPTY : { "isSuccess": false, "code": 2020, "message": "검색을 위해 지역을 입력해주세요" },
     INTERVAL_INVALID : { "isSuccess": false, "code": 2021, "message": "올바른 기간을 입력해주세요" },
+
+    FEEDINDEX_EMPTY : { "isSuccess": false, "code": 2022, "message": "피드를 입력해주세요" },
 
     REGION_EMPTY : { "isSuccess": false, "code": 2030, "message": "지역을 입력해주세요." },
 
@@ -62,6 +66,8 @@ module.exports = {
 
     KAKAOUSER_REDUNDANT : {"isSuccess": false, "code": 3007, "message": "이미 가입된 유저입니다. 바로 로그인해주세요." },
 
+    USER_SUSPENDED : {"isSuccess": false, "code": 3008, "message": "정지된 계정입니다. 관리자에게 문의하세요." },
+
     FEED_EMPTY : {"isSuccess": false, "code": 3010, "message": "피드 정보가 존재하지 않습니다." },
     FEED_COMMENT_EMPTY : {"isSuccess": false, "code": 3011, "message": "피드 댓글 정보가 존재하지 않습니다." },
 
@@ -69,6 +75,8 @@ module.exports = {
     PAGE_WRONG : { "isSuccess": false, "code": 3031, "message": "유효하지 않은 페이지입니다." },
 
     FEEDBACK_PARAMETER_INVALID : { "isSuccess": false, "code": 3040, "message": "유효하지 않은 숙소" },
+
+    FEEDREPORT_REDUNDANT : { "isSuccess": false, "code": 3050, "message": "이미 신고한 피드입니다." },
 
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},

@@ -53,14 +53,32 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
     if (proscons["keyword"]) {
       proscons["keyword"] = proscons["keyword"].split(",");
     }
-    
-    
-    const hashTags = feedInfo["hashTags"];
 
+    let hashTags = [];
+    
+    if (feedInfo["hashTags"]) {
+      for(var i = 0; i<feedInfo["hashTags"].length; i++) {
+        hashTags.push({ "hashTags":feedInfo["hashTags"][i]} );
+      }
+      
+    }
+  
     delete feedInfo.hashTags;
 
-    const prosAndCons = { "cons": proscons[0]["keyword"], "pros": proscons[1]["keyword"]};
-  
+    let prosAndCons;
+    if(proscons.length > 0) {
+      if (proscons[0] && proscons[1]) {
+        prosAndCons = { "cons": proscons[0]["keyword"], "pros": proscons[1]["keyword"]};
+      }
+      else if(proscons[0] && proscons[0]["status"] == "pros") {
+        prosAndCons = { "pros": proscons[0]["keyword"]};
+      }
+      else {
+        prosAndCons = { "cons": proscons[0]["keyword"]};
+      }
+    }
+    
+
     connection.release();
 
 
@@ -84,7 +102,19 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
 
     const feedParams = [feedIndex, feedIndex];
 
+    const feedCommentIndex = await feedViewDao.selectFeedCommentIndex(connection, feedIndex);
+
     const feedComment = await feedViewDao.selectFeedComment(connection, feedParams);
+
+    let likeNumResult = [];
+
+    for (var i = 0; i< feedCommentIndex.length; i ++) {
+      [likeNumResult[i]] = await feedViewDao.selectLikeNum(connection, feedCommentIndex[i].commentIndex);
+    }
+
+    for (var i = 0; i< feedComment.length; i ++) {
+      feedComment[i].likeNum = likeNumResult[i].likeNum;
+    }
 
     connection.release();
 
@@ -175,4 +205,44 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
     connection.release();
 
     return unlikeResult;
+  }
+
+  exports.searchLodging = async function(lodgings) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    
+    const lodgingResult = await feedViewDao.getSearchLodgingD(connection, lodgings);
+
+    connection.release();
+
+    return lodgingResult;
+  }
+
+  exports.searchLodging2 = async function(lodgingIndex) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    
+    const lodgingResult = await feedViewDao.getSearchLodgingDT(connection, lodgingIndex);
+
+    connection.release();
+
+    return lodgingResult;
+  }
+
+  exports.searchTag = async function(tag) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    
+    const tagResult = await feedViewDao.getSearchTagD(connection, tag);
+
+    connection.release();
+
+    return tagResult;
+  }
+
+  exports.searchTag2 = async function(tag) {
+    const connection = await pool.getConnection(async (conn) => conn);
+    
+    const tagResult = await feedViewDao.getSearchTagDT(connection, tag);
+
+    connection.release();
+
+    return tagResult;
   }

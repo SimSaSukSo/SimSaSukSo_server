@@ -37,11 +37,28 @@ exports.kakaoCreateUser = async function (nickname, kaokaoId, avartarUrl, email)
     }
 };
 
+// 애플 회원가입
+exports.appleCreateUser = async function (nickname, appleId, email) {
+    try {
+        const insertUserInfoParams = [nickname, appleId, email];
+
+        //회원가입
+        const connection = await pool.getConnection(async (conn) => conn);
+        const signUpResult = await userDao.insertUserInfoByApple(connection, insertUserInfoParams);
+        connection.release();
+        return response(baseResponse.SUCCESS);
+    } catch (err) {
+        logger.error(`App - appleCreateUser Service error\n: ${err.message}`);
+        return errResponse(baseResponse.DB_ERROR);
+    }
+};
+
+
 // 닉네임 설정
-exports.setNickname = async function(nickname, kakaoId) {
+exports.setNickname = async function(nickname, userIndex) {
     try {
         const connection = await pool.getConnection(async (conn) => conn);
-        const insertUserInfoParams = [nickname, kakaoId];
+        const insertUserInfoParams = [nickname, userIndex];
         const setNicknameResult = await userDao.updateUserNickname(connection, insertUserInfoParams);
         connection.release();
         return response(baseResponse.SUCCESS);
@@ -50,3 +67,33 @@ exports.setNickname = async function(nickname, kakaoId) {
         return errResponse(baseResponse.DB_ERROR);
     }
 };
+
+exports.updatePrfileUrl = async function(profileUrl, userIndex) {
+    try {
+        const connection = await pool.getConnection(async (conn) => conn);
+        const insertUserInfoParams = [profileUrl, userIndex];
+        const updateUserProfileResult = await userDao.updateUserProfile(connection, insertUserInfoParams);
+        connection.release();
+        return response(baseResponse.SUCCESS);
+    } catch (err) {
+        logger.error(`App - setUserProfile Service error\n: ${err.message}`);
+        return errResponse(baseResponse.DB_ERROR);
+    }
+}
+
+exports.deleteUser = async function(userIndex) {
+    try {
+        const connection = await pool.getConnection(async (conn) => conn);
+        
+        const deleteUserResult1 = await userDao.deleteUser1(connection, userIndex);
+        const deleteUserResult2 = await userDao.deleteUser2(connection, userIndex);
+        const deleteUserResult3 = await userDao.deleteUser3(connection, userIndex);
+        const deleteUserResult4 = await userDao.deleteUser4(connection, userIndex);
+
+        connection.release();
+        return response(baseResponse.SUCCESS);
+    } catch (err) {
+        logger.error(`App - deleteUser Service error\n: ${err.message}`);
+        return errResponse(baseResponse.DB_ERROR);
+    }
+}

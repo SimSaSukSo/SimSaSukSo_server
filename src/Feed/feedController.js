@@ -20,7 +20,10 @@ exports.index = async function (req, res) {
 
     // 유효성 검사
     if (!locationId) return res.json(errResponse(baseResponse.REGION_EMPTY));
-    if (Number.isNaN(locationId) || locationId < 1000 || locationId > 1015) return res.json(errResponse(baseResponse.REGION_WRONG));
+    if (Number.isNaN(locationId)) return res.json(errResponse(baseResponse.REGION_WRONG));
+    if (locationId != 2000) {
+        if (locationId < 1000 || locationId > 1015) return res.json(errResponse(baseResponse.REGION_WRONG));
+    }
     
     // 지역명, 지역 범위 추출
     const regionName = location.getRegionNameByLocationId(locationId);
@@ -105,7 +108,7 @@ exports.hot = async function (req, res) {
     if (!page) page = 1;
 
     page = parseInt(page, 10);
-    if (Number.isNaN(page)) return res.json(errResponse(baseResponse.PAGE_WRONG));
+    if (Number.isNaN(page) || page < 1) return res.json(errResponse(baseResponse.PAGE_WRONG));
 
     try {
         // 인기 해시태그, 피드 제공 + 페이징
@@ -133,9 +136,15 @@ exports.hot = async function (req, res) {
             return res.json(errResponse(baseResponse.DB_ERROR));
         }
 
+        // 마지막 페이지인지
+        let isLast = false;
+        if (feeds.length < feedPerPage)
+            isLast = true;
+
         const result = {
             hashTags,
-            feeds
+            feeds,
+            isLast
         };
 
         // 인기 피드 조회 성공
@@ -158,7 +167,7 @@ exports.new = async function (req, res) {
     if (!page) page = 1;
 
     page = parseInt(page, 10);
-    if (Number.isNaN(page)) return res.json(errResponse(baseResponse.PAGE_WRONG));
+    if (Number.isNaN(page) || page < 1) return res.json(errResponse(baseResponse.PAGE_WRONG));
 
     try {
         // 피드 제공 + 페이징
@@ -172,8 +181,14 @@ exports.new = async function (req, res) {
             return res.json(errResponse(baseResponse.DB_ERROR));
         }
 
+        // 마지막 페이지인지
+        let isLast = false;
+        if (feeds.length < feedPerPage)
+            isLast = true;
+
         const result = {
-            feeds
+            feeds,
+            isLast
         };
 
         // 최신 피드 조회 성공

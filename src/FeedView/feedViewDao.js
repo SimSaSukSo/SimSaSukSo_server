@@ -14,14 +14,18 @@ return imageRow;
 
 async function selectLike(connection, requestParams) {
 const selectLikeQuery = `
-    SELECT count(*) as likeNum,
-        isLike.isLiked
+    SELECT COUNT(*) likeNum,
+    IFNULL(FL.isLiked, 0) as isLiked
     FROM FeedLike
-    INNER JOIN (SELECT IFNULL(count(*), 0) as isLiked
-                    FROM FeedLike
-                    WHERE FeedLike.feedIndex = ? and
-                        FeedLike.userIndex = ?) isLike
-    WHERE FeedLike.feedIndex = ?;
+    INNER JOIN(
+    SELECT COUNT(*) as isLiked
+    FROM FeedLike
+    WHERE FeedLike.feedIndex = ? and
+    FeedLike.userIndex = ? and
+    FeedLike.status = 'like'
+    ) FL
+    WHERE FeedLike.feedIndex = ? and
+    FeedLike.status = 'like';
             `;
 const [feedLikeRow] = await connection.query(selectLikeQuery, requestParams);
 return feedLikeRow;
@@ -65,7 +69,7 @@ async function selectProsAndCons(connection, feedIndex) {
     SELECT FeedProsAndCons.status,
         group_concat(LodgingProsAndCons.keyword) as keyword
     FROM FeedProsAndCons, LodgingProsAndCons
-    WHERE FeedProsAndCons.feedIndex = 1 and
+    WHERE FeedProsAndCons.feedIndex = ? and
         FeedProsAndCons.lodgingProsAndConsIndex = LodgingProsAndCons.lodgingProsAndConsIndex
     GROUP BY FeedProsAndCons.status;
                 `;
@@ -131,37 +135,46 @@ async function selectLodgingInfo(connection, feedParams) {
 
 async function selectFeedComment(connection, feedCommentParams) {
     const selectFeedCommentQuery = `
-     SELECT COMLIKE.commentIndex,
-            COMLIKE.userIndex,
-            COMLIKE.nickname,
-            COMLIKE.avatarUrl,
-            COMLIKE.content,
-            COMLIKE.createdAt,
-            COMLIKE.updatedAt,
-            count(CommentLike.commentIndex) as likeNum
-        FROM CommentLike
-        INNER JOIN(
-        SELECT Comment.commentIndex,
-            Comment.userIndex,
-            User.nickname,
-            User.avatarUrl,
-            Comment.content,
-            Comment.createdAt,
-            Comment.updatedAt
-        FROM CommentLike, Comment, User
-        WHERE (Comment.feedIndex = ? and
-            Comment.userIndex = User.userIndex) or
-            (Comment.feedIndex = ? and
-            Comment.commentIndex = CommentLike.commentIndex and
-            CommentLike.status = 'like' and
-            Comment.userIndex = User.userIndex)
-        GROUP BY Comment.commentIndex
-        ) COMLIKE
-        WHERE CommentLike.commentIndex = COMLIKE.commentIndex
-        GROUP BY CommentLike.commentIndex;
+    SELECT Comment.commentIndex,
+        Comment.userIndex,
+        User.nickname,
+        User.avatarUrl,
+        Comment.content,
+        Comment.createdAt,
+        Comment.updatedAt
+    FROM CommentLike, Comment, User
+    WHERE (Comment.feedIndex = ? and
+        Comment.userIndex = User.userIndex) or
+        (Comment.feedIndex = ? and
+        Comment.commentIndex = CommentLike.commentIndex and
+        CommentLike.status = 'like' and
+        Comment.userIndex = User.userIndex)
+    GROUP BY Comment.commentIndex;
                 `;
     const [feedCommentInfoRow] = await connection.query(selectFeedCommentQuery, feedCommentParams);
     return feedCommentInfoRow;
+}
+
+async function selectFeedCommentIndex(connection, feedIndex) {
+    const selectFeedCommentIndexQuery = `
+        SELECT Comment.commentIndex
+        FROM Comment
+        WHERE Comment.feedIndex = ?;
+                `;
+    const [feedCommentIndexRow] = await connection.query(selectFeedCommentIndexQuery, feedIndex);
+    return feedCommentIndexRow;
+}
+
+async function selectLikeNum(connection, commentIndex) {
+    const likeNumQuery = `
+    SELECT count(CommentLike.commentLikeIndex) as likeNum
+    FROM CommentLike
+    WHERE CommentLike.commentIndex = ? and
+          CommentLike.status = 'like';
+    `;
+
+    const [likeNumRow] = await connection.query(likeNumQuery, commentIndex);
+    return likeNumRow;
 }
 
 async function searchFeedYear(connection, params) {
@@ -215,7 +228,8 @@ async function searchFeedYear(connection, params) {
     Feed.feedIndex = CONS.feedIndex
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
-    FeedImage.uploadOrder = 1;
+    FeedImage.uploadOrder = 1
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, params);
     return feedInfoRow;
@@ -272,7 +286,8 @@ async function searchFeedMonth(connection, params) {
     Feed.feedIndex = CONS.feedIndex
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
-    FeedImage.uploadOrder = 1;
+    FeedImage.uploadOrder = 1
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, params);
     return feedInfoRow;
@@ -329,7 +344,8 @@ async function searchFeedWeek(connection, params) {
     Feed.feedIndex = CONS.feedIndex
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
-    FeedImage.uploadOrder = 1;
+    FeedImage.uploadOrder = 1
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, params);
     return feedInfoRow;
@@ -386,7 +402,8 @@ async function searchFeedDay(connection, params) {
     Feed.feedIndex = CONS.feedIndex
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
-    FeedImage.uploadOrder = 1;
+    FeedImage.uploadOrder = 1
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, params);
     return feedInfoRow;
@@ -443,7 +460,8 @@ async function searchFeedHour(connection, params) {
     Feed.feedIndex = CONS.feedIndex
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
-    FeedImage.uploadOrder = 1;
+    FeedImage.uploadOrder = 1
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, params);
     return feedInfoRow;
@@ -488,7 +506,8 @@ async function searchFeedProsAllYear(connection, paramsProsAll) {
     Feed.feedIndex = CONS.feedIndex
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
-    FeedImage.uploadOrder = 1;
+    FeedImage.uploadOrder = 1
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, paramsProsAll);
     return feedInfoRow;
@@ -533,7 +552,8 @@ async function searchFeedProsAllMonth(connection, paramsProsAll) {
     Feed.feedIndex = CONS.feedIndex
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
-    FeedImage.uploadOrder = 1;
+    FeedImage.uploadOrder = 1
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, paramsProsAll);
     return feedInfoRow;
@@ -578,7 +598,8 @@ async function searchFeedProsAllWeek(connection, paramsProsAll) {
     Feed.feedIndex = CONS.feedIndex
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
-    FeedImage.uploadOrder = 1;
+    FeedImage.uploadOrder = 1
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, paramsProsAll);
     return feedInfoRow;
@@ -623,7 +644,8 @@ async function searchFeedProsAllDay(connection, paramsProsAll) {
     Feed.feedIndex = CONS.feedIndex
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
-    FeedImage.uploadOrder = 1;
+    FeedImage.uploadOrder = 1
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, paramsProsAll);
     return feedInfoRow;
@@ -668,7 +690,8 @@ async function searchFeedProsAllHour(connection, paramsProsAll) {
     Feed.feedIndex = CONS.feedIndex
     ) FFEED
     WHERE FeedImage.feedIndex = FFEED.feedIndex and
-    FeedImage.uploadOrder = 1;
+    FeedImage.uploadOrder = 1
+    ORDER BY FeedImage.createdAt DESC;
     `;
     const [feedInfoRow] = await connection.query(getSearchQuery, paramsProsAll);
     return feedInfoRow;
@@ -710,6 +733,291 @@ async function updateFeedDislike(connection, param) {
     return feedDisike
 }
 
+async function postFeedComment(connection, insertParams) {
+    const insertCommentQuery = `
+        INSERT INTO Comment(userIndex, feedIndex, content) VALUES (?, ?, ?);
+    `;
+
+    const [postComment] = await connection.query(insertCommentQuery, insertParams);
+    return postComment
+}
+
+async function putFeedComment(connection, putParams) {
+    const putCommentQuery = `
+        UPDATE Comment SET content = ? WHERE userIndex = ? and commentIndex = ? and feedIndex = ?;
+    `;
+
+    const [putComment] = await connection.query(putCommentQuery, putParams);
+    return putComment
+}
+
+async function deleteFeedComment(connection, deleteParams) {
+    const deleteCommentQuery = `
+        DELETE FROM Comment WHERE userIndex = ? and commentIndex = ? and feedIndex = ?;
+    `;
+
+    const [deleteComment] = await connection.query(deleteCommentQuery, deleteParams);
+    return deleteComment
+}
+
+async function getSearchLodgingD(connection, lodgings) {
+
+    const stringq = "'%" + lodgings + "%'";
+
+    const searchQuery = `
+    SELECT generalLodgingIndex,
+        name,
+        locationIndex,
+        address
+    FROM GeneralLodging
+    WHERE name LIKE ` + stringq;
+
+    const [lodgingsResult] = await connection.query(searchQuery);
+    return lodgingsResult
+}
+
+async function getSearchLodgingDT(connection, lodgingIndex) {
+
+    const searchQuery = `
+    SELECT FeedImage.feedIndex,
+        FeedImage.feedImageIndex,
+        FeedImage.source
+    FROM FeedImage
+    INNER JOIN(
+    SELECT feedIndex
+    FROM Feed
+    WHERE lodgingType = 1
+    and lodgingIndex = ?
+    ) Feeds
+    WHERE Feeds.feedIndex = FeedImage.feedIndex and
+        FeedImage.uploadOrder = 1;
+    `
+
+    const [lodgingsResult] = await connection.query(searchQuery, lodgingIndex);
+    return lodgingsResult
+}
+
+async function getSearchTagD(connection, tag) {
+
+    const stringq = "'%" + tag + "%'";
+
+    const searchQuery = `
+    SELECT HashTag.keyword
+    FROM HashTag
+    WHERE keyword LIKE ` + stringq;
+
+    const [tagResult] = await connection.query(searchQuery);
+    return tagResult
+}
+
+async function getSearchTagDT(connection, tag) {
+
+    const stringq = "'%" + tag + "%'";
+
+    const searchQuery = `
+    SELECT FeedImage.feedIndex,
+        FeedImage.feedImageIndex,
+        FeedImage.source
+    FROM FeedImage
+    INNER JOIN(
+    SELECT FeedTag.feedIndex
+    FROM HashTag, FeedTag
+    WHERE keyword LIKE ` + stringq + `and
+        FeedTag.hashTagIndex = HashTag.hashTagIndex
+    ) Feeds
+    WHERE Feeds.feedIndex = FeedImage.feedIndex and
+        FeedImage.uploadOrder = 1;`;
+
+    const [tagResult] = await connection.query(searchQuery);
+    return tagResult
+}
+
+async function selectUserIndex_to(connection, feedIndex) {
+    const select_to_Query = `
+        SELECT userIndex
+        FROM Feed
+        WHERE feedIndex = ?;
+    `;
+
+    const [user_to_Result] = await connection.query(select_to_Query, feedIndex);
+    return user_to_Result
+}
+
+async function reportFeed(connection, params) {
+    const reportQuery = `
+        INSERT INTO FeedReport(userIndex, feedIndex, userIndex_to) VALUES (?, ?, ?);
+    `;
+
+    const [reportResult] = await connection.query(reportQuery, params);
+    return reportResult
+}
+
+async function selectReportFeed(connection, feedIndex) {
+    const selectReportQuery = `
+        SELECT feedReportIndex
+        FROM FeedReport
+        WHERE feedIndex = ?;
+    `;
+
+    const [selectReportResult] = await connection.query(selectReportQuery, feedIndex);
+    return selectReportResult
+}
+
+async function deleteReportFeed(connection, feedIndex) {
+    const deleteReportFeedQuery = `
+        DELETE FROM Feed WHERE feedIndex = ?;
+    `;
+
+    const [deleteFeedResult] = await connection.query(deleteReportFeedQuery, feedIndex);
+    return deleteFeedResult
+}
+
+async function deleteReportComment(connection, feedIndex) {
+    const deleteReportCommentQuery = `
+        DELETE FROM Comment WHERE feedIndex = ?;
+    `;
+
+    const [deleteCommentResult] = await connection.query(deleteReportCommentQuery, feedIndex);
+    return deleteCommentResult
+}
+
+async function selectReportComment(connection, feedIndex) {
+    const selectReportCommentQuery = `
+        SELECT commentIndex
+        FROM Comment
+        WHERE feedIndex = ?;
+    `;
+
+    const [selectReportCommentResult] = await connection.query(selectReportCommentQuery, feedIndex);
+    return selectReportCommentResult
+}
+
+async function deleteReportCommentLike(connection, commentIndex) {
+    const deleteReportCommentLikeQuery = `
+        DELETE FROM CommentLike WHERE commentIndex = ?;
+    `;
+
+    const [deleteCommentLikeResult] = await connection.query(deleteReportCommentLikeQuery, commentIndex);
+    return deleteCommentLikeResult
+}
+
+async function deleteReportFeedImage(connection, feedIndex) {
+    const deleteReportFeedImageQuery = `
+        DELETE FROM FeedImage WHERE feedIndex = ?;
+    `;
+
+    const [deleteFeedImageResult] = await connection.query(deleteReportFeedImageQuery, feedIndex);
+    return deleteFeedImageResult
+}
+
+async function deleteReportFeedLike(connection, feedIndex) {
+    const deleteReportFeedLikeQuery = `
+        DELETE FROM FeedLike WHERE feedIndex = ?;
+    `;
+
+    const [deleteFeedLikeResult] = await connection.query(deleteReportFeedLikeQuery, feedIndex);
+    return deleteFeedLikeResult
+}
+
+async function deleteReportFeedProsAndCons(connection, feedIndex) {
+    const deleteReportFeedProsAndConsQuery = `
+        DELETE FROM FeedProsAndCons WHERE feedIndex = ?;
+    `;
+
+    const [deleteFeedProsAndConsResult] = await connection.query(deleteReportFeedProsAndConsQuery, feedIndex);
+    return deleteFeedProsAndConsResult
+}
+
+async function deleteReportFeedTag(connection, feedIndex) {
+    const deleteReportFeedTagQuery = `
+        DELETE FROM FeedTag WHERE feedIndex = ?;
+    `;
+
+    const [deleteFeedTagResult] = await connection.query(deleteReportFeedTagQuery, feedIndex);
+    return deleteFeedTagResult
+}
+
+async function deleteReportFeedTool(connection, feedIndex) {
+    const deleteReportFeedToolQuery = `
+        DELETE FROM FeedTool WHERE feedIndex = ?;
+    `;
+
+    const [deleteFeedToolResult] = await connection.query(deleteReportFeedToolQuery, feedIndex);
+    return deleteFeedToolResult
+}
+
+async function deleteReportReliability(connection, feedIndex) {
+    const deleteReportReliabilityQuery = `
+        DELETE FROM Reliability WHERE feedIndex = ?;
+    `;
+
+    const [deleteReportReliabilityResult] = await connection.query(deleteReportReliabilityQuery, feedIndex);
+    return deleteReportReliabilityResult
+}
+
+async function deleteReportSavedFeed(connection, feedIndex) {
+    const deleteReportSavedFeedQuery = `
+        DELETE FROM SavedFeed WHERE feedIndex = ?;
+    `;
+
+    const [deleteSavedFeedResult] = await connection.query(deleteReportSavedFeedQuery, feedIndex);
+    return deleteSavedFeedResult
+}
+
+async function selectUserFeedReport(connection, params) {
+    const selectUserFeedReportQuery = `
+        SELECT feedReportIndex
+        FROM FeedReport
+        WHERE userIndex = ? and feedIndex = ?;
+    `;
+
+    const [reportCountResult] = await connection.query(selectUserFeedReportQuery, params);
+    return reportCountResult
+}
+
+async function selectFeed(connection, feedIndex) {
+    const selectFeedQuery = `
+        SELECT *
+        FROM Feed
+        WHERE feedIndex = ?;
+    `;
+
+    const [selectFeedResult] = await connection.query(selectFeedQuery, feedIndex);
+    return selectFeedResult
+}
+
+async function selectUserReportFeedCount(connection, userIndex) {
+    const selectCountQuery = `
+    SELECT COUNT(*) as userReportFeedCount
+    FROM FeedReport
+    INNER JOIN(
+    SELECT FeedReport.feedIndex,
+           COUNT(feedIndex) as reportCount
+    FROM FeedReport
+    WHERE userIndex_to = ?
+    GROUP BY feedIndex
+    ) FR
+    WHERE FR.feedIndex = FeedReport.feedIndex and
+          FR.reportCount >= 10
+    GROUP BY FeedReport.feedIndex;
+    `;
+
+    const [selectCountResult] = await connection.query(selectCountQuery, userIndex);
+    return selectCountResult;
+}
+
+async function suspendUser(connection, userIndex) {
+    const suspendUserQuery = `
+      UPDATE User SET status = 'suspended' WHERE userIndex = ?;
+    `;
+    const deleteUserRow = await connection.query(
+      suspendUserQuery,
+      userIndex
+    );
+    return deleteUserRow
+  }
+
+
 module.exports = {
     selectImageList,
     selectLike,
@@ -733,5 +1041,32 @@ module.exports = {
     insertFeedLike,
     updateFeedLike,
     updateFeedDislike,
+    postFeedComment,
+    putFeedComment,
+    deleteFeedComment,
+    getSearchLodgingD,
+    getSearchLodgingDT,
+    getSearchTagD,
+    getSearchTagDT,
+    reportFeed,
+    selectReportFeed,
+    deleteReportFeed,
+    deleteReportComment,
+    selectReportComment,
+    deleteReportCommentLike,
+    deleteReportFeedImage,
+    deleteReportFeedLike,
+    deleteReportFeedProsAndCons,
+    deleteReportFeedTag,
+    deleteReportFeedTool,
+    deleteReportReliability,
+    deleteReportSavedFeed,
+    selectUserFeedReport,
+    selectFeed,
+    selectFeedCommentIndex,
+    selectLikeNum,
+    selectUserIndex_to,
+    selectUserReportFeedCount,
+    suspendUser,
 };
   
