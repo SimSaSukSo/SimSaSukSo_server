@@ -94,6 +94,22 @@ async function updateUserProfile(connection, params) {
   return updateUserNicknameRow
 }
 
+async function deleteUser0(connection, userIndex) {
+  const deleteUserQuery = `
+      DELETE
+      FROM FeedImage
+      WHERE FeedImage.feedIndex IN (
+      SELECT Feed.feedIndex
+      FROM Feed
+      WHERE Feed.userIndex = ?);
+  `;
+  const deleteUserRow = await connection.query(
+    deleteUserQuery,
+    userIndex
+  );
+  return deleteUserRow
+}
+
 async function deleteUser1(connection, userIndex) {
   const deleteUserQuery = `
     DELETE FROM User WHERE userIndex = ?;
@@ -130,6 +146,68 @@ async function deleteUser3(connection, userIndex) {
 async function deleteUser4(connection, userIndex) {
   const deleteUserQuery = `
     DELETE FROM Feed WHERE userIndex = ?;
+  `;
+  const deleteUserRow = await connection.query(
+    deleteUserQuery,
+    userIndex
+  );
+  return deleteUserRow
+}
+
+async function deleteUser5(connection, userIndex) {
+  const deleteUserQuery = `
+    DELETE FROM FeedLike WHERE userIndex = ?;
+  `;
+  const deleteUserRow = await connection.query(
+    deleteUserQuery,
+    userIndex
+  );
+  return deleteUserRow
+}
+
+async function deleteUser6(connection, userIndex) {
+  const deleteUserQuery = `
+    DELETE
+    FROM FeedProsAndCons
+    WHERE FeedProsAndCons.feedIndex IN (
+    SELECT Feed.feedIndex
+    FROM Feed
+    WHERE Feed.userIndex = ?
+    );
+  `;
+  const deleteUserRow = await connection.query(
+    deleteUserQuery,
+    userIndex
+  );
+  return deleteUserRow
+}
+
+async function deleteUser7(connection, userIndex) {
+  const deleteUserQuery = `
+    DELETE
+    FROM FeedTag
+    WHERE FeedTag.feedIndex IN (
+    SELECT Feed.feedIndex
+    FROM Feed
+    WHERE Feed.userIndex = ?
+    );
+  `;
+  const deleteUserRow = await connection.query(
+    deleteUserQuery,
+    userIndex
+  );
+  return deleteUserRow
+}
+
+async function deleteUser8(connection, userIndex) {
+  const deleteUserQuery = `
+    DELETE
+    FROM FeedTool
+    WHERE FeedTool.feedIndex IN (
+    SELECT Feed.feedIndex
+    FROM Feed
+    WHERE Feed.userIndex = ?
+    );
   `;
   const deleteUserRow = await connection.query(
     deleteUserQuery,
@@ -175,4 +253,9 @@ module.exports = {
   selectUserId,
   selectUserStatus1,
   selectUserStatus2,
+  deleteUser0,
+  deleteUser5,
+  deleteUser6,
+  deleteUser7,
+  deleteUser8,
 };

@@ -38,6 +38,12 @@ module.exports = function(app){
 
     app.post('/api/feeds/:idx/report', jwtMiddleware, feedView.report);
 
+    // 피드 좋아요 API
+    app.post('/api/feeds/like', jwtMiddleware, feedView.like);
+
+    // 피드 좋아요 취소 API
+    app.post('/api/feeds/dislike', jwtMiddleware, feedView.dislike);
+
     // jwt를 사용하기 위해 jwtMiddleware 를 체이닝 방식으로 추가하는 예제
     // app.get('/app/users/:userId', jwtMiddleware, user.getUserById);
 
