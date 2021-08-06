@@ -1104,6 +1104,6 @@ module.exports = {
     suspendUser,
     selectUserInfo,
     selectFeedHashTag,
-    selectFeedReliablity,
+    selectFeedReliablity
 };
   
