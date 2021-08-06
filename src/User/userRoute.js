@@ -15,6 +15,9 @@ module.exports = function(app){
     app.post('/api/users/appleLogin', user.appleLogin);
     app.post('/api/users/apple/callback', user.appleLoginCallback);
 
+    // 4. 계정 정보 조회
+    app.get('/api/users', jwtMiddleware, user.userInfo);
+
     app.put('/api/users/profileUrl', jwtMiddleware, user.setProfileUrl);
 
     app.delete('/api/users', jwtMiddleware, user.deleteUser);

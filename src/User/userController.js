@@ -333,3 +333,35 @@ exports.deleteUser= async function(req, res) {
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
+
+exports.userInfo = async function(req, res) {
+    const token = req.verifiedToken;
+    const userIndex = token.userIndex;
+
+    try {
+        if(!userIndex) {
+            return res.json(errResponse(baseResponse.USER_USERID_EMPTY));
+        }
+
+        const selectUserResult = await userProvider.retrieveUserByuserIndex(userIndex);
+
+        if (selectUserResult) {
+            const email = selectUserResult.email;
+            const nickname = selectUserResult.nickname;
+            const avatarUrl = selectUserResult.avatarUrl;
+
+            const result = {
+                email,
+                nickname,
+                avatarUrl
+            };
+            
+            return res.json(response(baseResponse.SUCCESS, result));
+        } else {
+            return res.json(errResponse(baseResponse.USER_USERID_NOT_EXIST));
+        }
+    } catch (err) {
+        logger.error(`유저 정보 조회 중 Error`);
+        return res.json(errResponse(baseResponse.DB_ERROR));
+    }
+}
