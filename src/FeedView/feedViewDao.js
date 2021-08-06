@@ -77,25 +77,39 @@ async function selectProsAndCons(connection, feedIndex) {
     return prosAndConsRow;
 }
 
-async function selectFeedInfo(connection, feedParams) {
+async function selectFeedInfo(connection, feedIndex) {
     const selectFeedInfoQuery = `
     SELECT Feed.review,
             Feed.charge,
             Feed.startDate,
             Feed.endDate,
-            Feed.createdAt,
-            sum(Reliability.degree) / count(*) as reliability,
-            HashTags.hashTags
-    FROM Feed, Reliability
-    INNER JOIN(
+            Feed.createdAt
+    FROM Feed
+    WHERE Feed.feedIndex = ?;
+                `;
+    const [feedInfoRow] = await connection.query(selectFeedInfoQuery, feedIndex);
+    return feedInfoRow;
+}
+
+async function selectFeedHashTag(connection, feedIndex) {
+    const selectFeedInfoQuery = `
     SELECT group_concat(HashTag.keyword) as hashTags
     FROM FeedTag, HashTag
     WHERE feedIndex = ? and
-    FeedTag.hashTagIndex = HashTag.hashTagIndex ) HashTags
+    FeedTag.hashTagIndex = HashTag.hashTagIndex;
+                `;
+    const [feedInfoRow] = await connection.query(selectFeedInfoQuery, feedIndex);
+    return feedInfoRow;
+}
+
+async function selectFeedReliablity(connection, feedIndex) {
+    const selectFeedInfoQuery = `
+    SELECT sum(Reliability.degree) / count(*) as reliability
+    FROM Feed, Reliability
     WHERE Feed.feedIndex = ? and
         Reliability.feedIndex = Feed.feedIndex;
                 `;
-    const [feedInfoRow] = await connection.query(selectFeedInfoQuery, feedParams);
+    const [feedInfoRow] = await connection.query(selectFeedInfoQuery, feedIndex);
     return feedInfoRow;
 }
 
@@ -1089,5 +1103,7 @@ module.exports = {
     selectUserReportFeedCount,
     suspendUser,
     selectUserInfo,
+    selectFeedHashTag,
+    selectFeedReliablity,
 };
   
