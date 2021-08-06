@@ -27,9 +27,15 @@ exports.kakaoCreateUser = async function (nickname, kaokaoId, avartarUrl, email)
         if(!emailResult[0]){
             //회원가입
             const connection = await pool.getConnection(async (conn) => conn);
-            const signUpResult = await userDao.insertUserInfo(connection,insertUserInfoParams);
+            const [signUpResult] = await userDao.insertUserInfo(connection,insertUserInfoParams);
+            
             connection.release();
-            return response(baseResponse.SUCCESS);
+
+            if(signUpResult) {
+                return signUpResult["insertId"];
+            } else {
+                return response(baseResponse.SUCCESS);
+            }
         } 
     } catch (err) {
         logger.error(`App - kakaoCreateUser Service error\n: ${err.message}`);

@@ -12,6 +12,7 @@ module.exports = {
     TOKEN_VERIFICATION_SUCCESS : { "isSuccess": true, "code": 1001, "message":"JWT 토큰 검증 성공" }, // ?
     ACCESSTOKEN_EMPTY : {"isSuccess": false, "code": 2000, "message":"액세스 토큰을 입력해주세요."},
     ACCESSTOKEN_ERROR : { "isSuccess": false, "code": 2019, "message": "액세스 토큰 에러" },
+    CREATE_TOKEN_ERROR : { "isSuccess": false, "code": 2060, "message": "JWT 토큰 생성 중 에러" },
 
     //Request error
     NICKNAME_EMPTY : { "isSuccess": false, "code": 2001, "message":"닉네임을 입력해주세요" },

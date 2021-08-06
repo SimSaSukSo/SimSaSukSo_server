@@ -49,63 +49,94 @@ const apple = new AppleAuth(appleAuthConfig, path.join(__dirname,'../../config/a
             logger.info(avartarUrl);
             logger.info(nickname);
 
-            const userResult = await userProvider.retrieveUser(email);
+            try {
+                const userResult = await userProvider.retrieveUser(email);
 
-            const [userStatus] = await userProvider.retrieveKakaoStatus(email);
+                const [userStatus] = await userProvider.retrieveKakaoStatus(email);
 
-            // 이미 회원가입된 유저일 경우
-            if(userResult != null && userResult != undefined && userResult.length != 0) {
-                try {
-                    if(userStatus.status == 'suspended') {
-                        return res.json(errResponse(baseResponse.USER_SUSPENDED));
+                // 이미 회원가입된 유저일 경우
+                if(userResult != null && userResult != undefined && userResult.length != 0) {
+                    try {
+                        if(userStatus.status == 'suspended') {
+                            return res.json(errResponse(baseResponse.USER_SUSPENDED));
+                        }
+
+                        let userIndex = userResult[0].userIndex;
+                        // 회원가입 시 토큰 생성
+                        let token = await jwt.sign(
+                            {
+                                userIndex: userIndex
+                            }, // 토큰의 내용(payload)
+                            secret_config.jwtsecret, // 비밀키
+                            {
+                                expiresIn: "365d",
+                                subject: "userInfo",
+                            } // 유효 기간 365일
+                        );
+
+                        // 토큰 생성 성공
+                        if (token) {
+                            
+                            loginAgainResult.token = token;
+                            return res.send(loginAgainResult);
+                        }
+
+                    } catch (err) {
+                        console.log(err)
+                        logger.error(`재로그인 중 Error`);
+                        return res.json(errResponse(baseResponse.SERVER_ERROR));
                     }
-
-                    let userIndex = userResult[0].userIndex;
-                    // 회원가입 시 토큰 생성
-                    let token = await jwt.sign(
-                        {
-                            userIndex: userIndex
-                        }, // 토큰의 내용(payload)
-                        secret_config.jwtsecret, // 비밀키
-                        {
-                            expiresIn: "365d",
-                            subject: "userInfo",
-                        } // 유효 기간 365일
-                    );
-
-                    // 토큰 생성 성공
-                    if (token) {
-                        
-                        loginAgainResult.token = token;
-                        return res.send(loginAgainResult);
-                    }
-
-                } catch (err) {
-                    console.log(err)
-                    logger.error(`재로그인 중 Error`);
-                    return res.json(errResponse(baseResponse.SERVER_ERROR));
                 }
+            } catch (err) {
+                console.log(err);
+                logger.error(`기존 유저 조회 중 Error`);
+                return res.json(errResponse(baseResponse.DB_ERROR));
+            }
+            
+
+            
+
+            let result;
+            let newUserResult;
+            let userIndex;
+            let userIndexResult;
+
+            try {
+                userIndexResult = await userService.kakaoCreateUser(nickname, kakaoId, avartarUrl, email);
+                console.log(userIndexResult);
+                // newUserResult = await userProvider.retrieveUser(email);
+                // userIndex = newUserResult[0].userIndex;
+                userIndex = userIndexResult;
+            } catch (err) {
+                console.log(err);
+                logger.error(`신규 유저 생성 중 Error`);
+                return res.json(errResponse(baseResponse.DB_ERROR));
             }
 
-            const result = await userService.kakaoCreateUser(nickname, kakaoId, avartarUrl, email);
-            const newUserResult = await userProvider.retrieveUser(email);
-            let userIndex = newUserResult[0].userIndex;
+            let token;
+            try {
+                // 회원가입 시 토큰 생성
+                token = await jwt.sign(
+                {
+                    userIndex: userIndex
+                }, // 토큰의 내용(payload)
+                secret_config.jwtsecret, // 비밀키
+                {
+                    expiresIn: "365d",
+                    subject: "userInfo",
+                } // 유효 기간 365일
+                );
+            } catch (err) {
+                console.log(err);
+                logger.error(`토큰 생성 중 Error`);
+                return res.json(errResponse(baseResponse.CREATE_TOKEN_ERROR));
+            }
 
-            // 회원가입 시 토큰 생성
-            let token = await jwt.sign(
-            {
-                userIndex: userIndex
-            }, // 토큰의 내용(payload)
-            secret_config.jwtsecret, // 비밀키
-            {
-                expiresIn: "365d",
-                subject: "userInfo",
-            } // 유효 기간 365일
-            );
+            result = errResponse(baseResponse.SUCCESS);
             
             // 토큰 생성 성공
             if (token) {
-                result.token = token
+                result.token = token;
                 return res.send(result);
             }
 
