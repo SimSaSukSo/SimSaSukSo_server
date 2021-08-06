@@ -1036,13 +1036,9 @@ async function selectUserInfo(connection, feedIndex) {
     SELECT User.userIndex,
         User.nickname,
         User.avatarUrl
-    FROM User
-    INNER JOIN(
-    SELECT Feed.userIndex
-    FROM Feed
-    WHERE Feed.feedIndex = ?
-    ) FEED
-    WHERE User.userIndex = FEED.userIndex;
+    FROM User, Feed
+    WHERE Feed.feedIndex = ? and
+          User.userIndex = Feed.userIndex;
     `;
     const [userInfoRow] = await connection.query(
         userInfoQuery,
@@ -1051,6 +1047,41 @@ async function selectUserInfo(connection, feedIndex) {
     return userInfoRow
 }
 
+async function selectFeedCommentLike(connection, param) {
+    const selectQuery = `
+        SELECT * FROM CommentLike WHERE userIndex = ? and commentIndex = ?;
+    `;
+
+    const [feedLike] = await connection.query(selectQuery, param);
+    return feedLike
+}
+
+async function insertFeedCommentLike(connection, param) {
+    const insertQuery = `
+        INSERT INTO CommentLike(userIndex, commentIndex) VALUES (?, ?);
+    `;
+
+    const [feedLike] = await connection.query(insertQuery, param);
+    return feedLike
+}
+
+async function updateFeedCommentLike(connection, param) {
+    const updateQuery = `
+        UPDATE CommentLike SET status = 'like' WHERE userIndex = ? and commentIndex = ?;
+    `;
+
+    const [feedLike] = await connection.query(updateQuery, param);
+    return feedLike
+}
+
+async function updateFeedCommentDislike(connection, param) {
+    const updateQuery = `
+        UPDATE CommentLike SET status = 'dislike' WHERE userIndex = ? and commentIndex = ?;
+    `;
+
+    const [feedDisike] = await connection.query(updateQuery, param);
+    return feedDisike
+}
 
 module.exports = {
     selectImageList,
@@ -1104,6 +1135,10 @@ module.exports = {
     suspendUser,
     selectUserInfo,
     selectFeedHashTag,
-    selectFeedReliablity
+    selectFeedReliablity,
+    selectFeedCommentLike,
+    insertFeedCommentLike,
+    updateFeedCommentLike,
+    updateFeedCommentDislike,
 };
   
