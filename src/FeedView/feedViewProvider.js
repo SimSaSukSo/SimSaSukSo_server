@@ -115,14 +115,26 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
     const feedComment = await feedViewDao.selectFeedComment(connection, feedParams);
 
     let likeNumResult = [];
+    let isLiked = [];
 
     for (var i = 0; i< feedCommentIndex.length; i ++) {
       [likeNumResult[i]] = await feedViewDao.selectLikeNum(connection, feedCommentIndex[i].commentIndex);
+      let params = [userIndex, feedCommentIndex[i].commentIndex];
+      const [commentLikedResult] = await feedViewDao.checkFeedCommentLike(connection, params);
+
+      if(!commentLikedResult || commentLikedResult == undefined || commentLikedResult == null) {
+        isLiked[i] = 0;
+      } else {
+        isLiked[i] = 1;
+      }
     }
 
     for (var i = 0; i< feedComment.length; i ++) {
       feedComment[i].likeNum = likeNumResult[i].likeNum;
+      feedComment[i].isLiked = isLiked[i];
     }
+
+    
 
     connection.release();
 
