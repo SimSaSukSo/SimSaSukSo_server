@@ -17,7 +17,9 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
     const [correction] = await feedViewDao.selectCorrection(connection, feedParams);
     const [save] = await feedViewDao.selectSave(connection, fuParams);
     const proscons = await feedViewDao.selectProsAndCons(connection, feedIndex);
-    const [feedInfo] = await feedViewDao.selectFeedInfo(connection, feedParams);
+    const [feedInfo] = await feedViewDao.selectFeedInfo(connection, feedIndex);
+    const [hashTagss] = await feedViewDao.selectFeedHashTag(connection, feedIndex);
+    const [reliability] = await feedViewDao.selectFeedReliablity(connection, feedIndex);
     const [lodgingInfo] = await feedViewDao.selectLodgingInfo(connection, feedParams);
     const [userInfo] = await feedViewDao.selectUserInfo(connection, feedIndex);
     
@@ -29,14 +31,18 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
       correction["correctionTool"] = correction["correctionTool"].split(",");
     }
 
-    if (feedInfo["reliability"]) {
+    if (reliability["reliability"]) {
 
-      feedInfo["reliability"] = parseInt(feedInfo["reliability"]);
+      reliability["reliability"] = parseInt(reliability["reliability"]);
+      feedInfo["reliability"] = reliability["reliability"];
+
+    } else {
+      feedInfo["reliability"] = null;
 
     }
 
-    if (feedInfo["hashTags"]) {
-      feedInfo["hashTags"] = feedInfo["hashTags"].split(",");
+    if (hashTagss["hashTags"]) {
+      hashTagss["hashTags"] = hashTagss["hashTags"].split(",");
     }
 
     if (feedInfo["startDate"]) {
@@ -57,9 +63,9 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
 
     let hashTags = [];
     
-    if (feedInfo["hashTags"]) {
-      for(var i = 0; i<feedInfo["hashTags"].length; i++) {
-        hashTags.push({ "hashTags":feedInfo["hashTags"][i]} );
+    if (hashTagss["hashTags"]) {
+      for(var i = 0; i<hashTagss["hashTags"].length; i++) {
+        hashTags.push({ "hashTags":hashTagss["hashTags"][i]} );
       }
       
     }
