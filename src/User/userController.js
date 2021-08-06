@@ -387,8 +387,10 @@ exports.userInfo = async function(req, res) {
             const email = selectUserResult.email;
             const nickname = selectUserResult.nickname;
             const avatarUrl = selectUserResult.avatarUrl;
+            const info = selectUserResult.kakaoId === null ? "apple" : "kakao";
 
             const result = {
+                info,
                 email,
                 nickname,
                 avatarUrl
