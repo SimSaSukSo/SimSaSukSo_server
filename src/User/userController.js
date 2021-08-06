@@ -151,6 +151,13 @@ exports.setNickname = async function (req, res) {
     }
 
     try {
+
+        const userIdResult = await userProvider.retrieveUserByuserIndex(userIndex);
+
+        if (!userIdResult || userIdResult == undefined || userIdResult == null) {
+            return res.json(errResponse(baseResponse.JWT_USER_INVALID));
+        }
+
         // 영문/숫자 포함 8자 이내 확인
         var regType = /^[A-Za-z0-9+]{0,8}$/;
         try {
@@ -167,7 +174,7 @@ exports.setNickname = async function (req, res) {
         try {
             // 닉네임 중복 여부 확인
             const nicknameList = await userProvider.retrieveNickname(nickname);
-            console.log(nicknameList);
+
             if (nicknameList) {
                 return res.json(errResponse(baseResponse.NICKNAME_REDUNDANT));
             }
