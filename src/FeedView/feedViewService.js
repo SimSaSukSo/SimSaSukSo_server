@@ -128,3 +128,37 @@ exports.feedReport = async function(userIndex, feedIndex) {
         return errResponse(baseResponse.DB_ERROR);
     }
 };
+
+exports.feedCommentLike = async function(userIndex, commentIndex) {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const param = [userIndex, commentIndex];
+
+    const selectLikeComment = await feedViewDao.selectFeedCommentLike(connection, param);
+
+    let likeResult;
+    if (selectLikeComment.length == 0) {
+      likeResult = await feedViewDao.insertFeedCommentLike(connection, param);
+      console.log('insert');
+    } else {
+      likeResult = await feedViewDao.updateFeedCommentLike(connection, param);
+      console.log('update')
+    }
+
+    connection.release();
+
+    return likeResult;
+    
+  };
+
+  exports.feedCommentDislike = async function(userIndex, commentIndex) {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const param = [userIndex, commentIndex];
+    
+    const unlikeCommentResult = await feedViewDao.updateFeedCommentDislike(connection, param);
+
+    connection.release();
+
+    return unlikeCommentResult;
+  };

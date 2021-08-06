@@ -291,3 +291,32 @@ exports.report = async function(req, res) {
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
+
+exports.likeComment = async function(req, res) {
+    const token = req.verifiedToken;
+    const userIndex = token.userIndex;
+    const commentIndex = req.params.idx;
+
+    try {
+        const feedLikeResult = await feedViewService.feedCommentLike(userIndex, commentIndex);
+        return res.send(response(baseResponse.SUCCESS));
+        
+    } catch (err) {
+        console.log(err);
+        return res.json(errResponse(baseResponse.DB_ERROR));
+    }
+}
+
+exports.dislikeComment = async function(req, res) {
+    const token = req.verifiedToken;
+    const userIndex = token.userIndex;
+    const commentIndex = req.params.idx;
+
+    try {
+        const feedUnLikeResult = await feedViewService.feedCommentDislike(userIndex, commentIndex);
+        return res.send(response(baseResponse.SUCCESS));
+    } catch (err) {
+        console.log(err);
+        return res.json(errResponse(baseResponse.DB_ERROR));
+    }
+}
