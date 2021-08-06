@@ -1047,6 +1047,15 @@ async function selectUserInfo(connection, feedIndex) {
     return userInfoRow
 }
 
+async function checkFeedCommentLike(connection, params) {
+    const selectQuery = `
+        SELECT * FROM CommentLike WHERE userIndex = ? and commentIndex = ? and status = 'like';
+    `;
+
+    const [feedLike] = await connection.query(selectQuery, params);
+    return feedLike
+}
+
 async function selectFeedCommentLike(connection, param) {
     const selectQuery = `
         SELECT * FROM CommentLike WHERE userIndex = ? and commentIndex = ?;
@@ -1140,5 +1149,6 @@ module.exports = {
     insertFeedCommentLike,
     updateFeedCommentLike,
     updateFeedCommentDislike,
+    checkFeedCommentLike,
 };
   
