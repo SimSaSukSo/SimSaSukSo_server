@@ -456,6 +456,17 @@ return rows;
   return rows;
 }
 
+async function createFeedcorrectionTool(conn, feedIndex, correctionTool) {
+  const connection = conn;
+  const Query = `
+  INSERT INTO FeedTool(feedIndex, correctionToolIndex) VALUES (?, ?);
+  `;
+  const Params = [feedIndex, correctionTool];
+  const [rows] = await connection.query(Query, Params);
+
+  return rows;
+}
+
 /**
  * update : 2021.07.17.
  * desc : API 9 - 저장된 에어비앤비 확인
@@ -603,4 +614,5 @@ module.exports = {
     isExistFeedInSavedList,
     createNewSavedFeed,
     updateSavedFeed,
+    createFeedcorrectionTool
 };
