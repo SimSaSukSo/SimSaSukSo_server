@@ -338,6 +338,18 @@ exports.uploadGeneralLodging = async function (req, res) {
             return res.json(errResponse(baseResponse.DB_ERROR));
         }
 
+        // 보정 도구 추가
+        try {
+            if (!(correctionTool == null || correctionTool == undefined)) {
+                for (let i=0; i<correctionTool.length; i++) {
+                    await feedDao.createFeedcorrectionTool(connection, feedIndex, correctionTool[i]);
+                }
+            }
+        } catch(err) {
+            logger.error(`API 8 - 보정 도구 추가 중 Error\n: ${JSON.stringify(err)}`);
+            return res.json(errResponse(baseResponse.DB_ERROR));
+        }
+
         // 성공
         await connection.commit();
         const result = {
@@ -493,6 +505,18 @@ exports.uploadGeneralLodging = async function (req, res) {
             }
         } catch(err) {
             logger.error(`API 9 - 장점 추가 중 Error\n: ${JSON.stringify(err)}`);
+            return res.json(errResponse(baseResponse.DB_ERROR));
+        }
+
+        // 보정 도구 추가
+        try {
+            if (!(correctionTool == null || correctionTool == undefined)) {
+                for (let i=0; i<correctionTool.length; i++) {
+                    await feedDao.createFeedcorrectionTool(connection, feedIndex, correctionTool[i]);
+                }
+            }
+        } catch(err) {
+            logger.error(`API 9 - 보정 도구 추가 중 Error\n: ${JSON.stringify(err)}`);
             return res.json(errResponse(baseResponse.DB_ERROR));
         }
 
