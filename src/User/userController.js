@@ -50,7 +50,6 @@ const apple = new AppleAuth(appleAuthConfig, path.join(__dirname,'../../config/a
             logger.info(nickname);
 
             try {
-                console.log(email);
                 const userResult = await userProvider.retrieveUserKakaoId(kakaoId);
 
                 const [userStatus] = await userProvider.retrieveKakaoStatus(kakaoId);
@@ -89,7 +88,7 @@ const apple = new AppleAuth(appleAuthConfig, path.join(__dirname,'../../config/a
                     }
                 }
             } catch (err) {
-                console.log(err);
+                logger.error(err);
                 logger.error(`기존 유저 조회 중 Error`);
                 return res.json(errResponse(baseResponse.DB_ERROR));
             }
