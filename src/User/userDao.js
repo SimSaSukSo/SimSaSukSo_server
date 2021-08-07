@@ -10,6 +10,16 @@ async function selectUserEmail(connection, email) {
   return userRow;
 }
 
+async function selectUserKaKaoId(connection, kakaoId) {
+  const selectUserIdQuery = `
+                 SELECT userIndex
+                 FROM User 
+                 WHERE kakaoId = ?;
+                 `;
+  const [userRow] = await connection.query(selectUserIdQuery, kakaoId);
+  return userRow;
+}
+
 async function selectUserId(connection, userIndex) {
   const selectUserIdQuery = `
                  SELECT *
@@ -216,13 +226,13 @@ async function deleteUser8(connection, userIndex) {
   return deleteUserRow
 }
 
-async function selectUserStatus1(connection, email) {
+async function selectUserStatus1(connection, kakaoId) {
   const selectUserIdQuery = `
     SELECT status
     FROM User
-    WHERE email = ?;
+    WHERE kakaoId = ?;
                  `;
-  const [statusRow] = await connection.query(selectUserIdQuery, email);
+  const [statusRow] = await connection.query(selectUserIdQuery, kakaoId);
   return statusRow;
 }
 
@@ -258,4 +268,5 @@ module.exports = {
   deleteUser6,
   deleteUser7,
   deleteUser8,
+  selectUserKaKaoId,
 };

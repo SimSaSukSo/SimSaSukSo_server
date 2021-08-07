@@ -18,13 +18,16 @@ exports.kakaoCreateUser = async function (nickname, kaokaoId, avartarUrl, email)
     try {
          // 기존 회원인지 확인
          const connection = await pool.getConnection(async (conn) => conn);
-         const emailResult = await userDao.selectUserEmail(connection, email);
+         const emailResult = await userDao.selectUserKaKaoId(connection, kaokaoId);
          connection.release();
 
+         if(!email || email == undefined || email == null) {
+            email = "이메일 없음";
+         }
          const insertUserInfoParams = [nickname, kaokaoId, avartarUrl, email];
 
         // 가입된 회원이 없는 경우
-        if(!emailResult[0]){
+        if(emailResult.length == 0){
             //회원가입
             const connection = await pool.getConnection(async (conn) => conn);
             const [signUpResult] = await userDao.insertUserInfo(connection,insertUserInfoParams);

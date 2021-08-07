@@ -50,9 +50,10 @@ const apple = new AppleAuth(appleAuthConfig, path.join(__dirname,'../../config/a
             logger.info(nickname);
 
             try {
-                const userResult = await userProvider.retrieveUser(email);
+                console.log(email);
+                const userResult = await userProvider.retrieveUserKakaoId(kakaoId);
 
-                const [userStatus] = await userProvider.retrieveKakaoStatus(email);
+                const [userStatus] = await userProvider.retrieveKakaoStatus(kakaoId);
 
                 // 이미 회원가입된 유저일 경우
                 if(userResult != null && userResult != undefined && userResult.length != 0) {

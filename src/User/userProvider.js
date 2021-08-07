@@ -14,6 +14,15 @@ exports.retrieveUser = async function (email) {
   return userResult;
 };
 
+exports.retrieveUserKakaoId = async function (kakaoId) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  const userResult = await userDao.selectUserKaKaoId(connection, kakaoId);
+
+  connection.release();
+
+  return userResult;
+};
+
 exports.retrieveNickname = async function(nickname) {
   const connection = await pool.getConnection(async (conn) => conn);
   const [nicknameResult] = await userDao.selectUserNickname(connection, nickname);
@@ -38,9 +47,9 @@ exports.retrieveUserByuserIndex = async function(userIndex) {
   return userResult;
 }
 
-exports.retrieveKakaoStatus = async function(email) {
+exports.retrieveKakaoStatus = async function(kakaoId) {
   const connection = await pool.getConnection(async (conn) => conn);
-  const userStatusResult = await userDao.selectUserStatus1(connection, email);
+  const userStatusResult = await userDao.selectUserStatus1(connection, kakaoId);
 
   connection.release();
 
