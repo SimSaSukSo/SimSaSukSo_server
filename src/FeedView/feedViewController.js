@@ -30,8 +30,8 @@ exports.getFeed = async function (req, res) {
             return res.send(response(baseResponse.SUCCESS, feedInfoResult));
         }
     } catch (err) {
-        console.log(err);
-        logger.error(`피드 정보 조회 중 Error`);
+        logger.error(err);
+        logger.error(`피드 정보 피드 조회 중 Error`);
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 };
@@ -56,8 +56,8 @@ exports.getComment = async function (req, res) {
             return res.send(response(baseResponse.SUCCESS, feedCommentResult));
         }
     } catch (err) {
-        console.log(err);
-        logger.error(`피드 정보 조회 중 Error`);
+        logger.error(err);
+        logger.error(`피드 댓글 정보 조회 중 Error`);
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
@@ -103,7 +103,8 @@ exports.getSearch = async function (req, res) {
         }
 
     } catch (err) {
-        console.log(err);
+        logger.error(err);
+        logger.error('피드 검색 API 중 에러');
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 
@@ -119,7 +120,8 @@ exports.like = async function(req, res) {
         return res.send(response(baseResponse.SUCCESS));
         
     } catch (err) {
-        console.log(err);
+        logger.error(err);
+        logger.error('피드 좋아요 API 중 에러');
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
@@ -133,7 +135,8 @@ exports.dislike = async function(req, res) {
         const feedUnLikeResult = await feedViewProvider.feedDislike(userIndex, feedIndex);
         return res.send(response(baseResponse.SUCCESS));
     } catch (err) {
-        console.log(err);
+        logger.error(err);
+        logger.error('피드 싫어요 API 중 에러');
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
@@ -149,8 +152,8 @@ exports.postComment = async function(req, res) {
         const postCommentResult = await feedViewService.feedPostComment(userIndex, feedIndex, content);
         return res.send(response(baseResponse.SUCCESS));
     } catch (err) {
-        console.log(err);
-        console.log('댓글 작성 API 중 에러');
+        logger.error(err);
+        logger.error('댓글 작성 API 중 에러');
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
@@ -166,8 +169,8 @@ exports.putComment = async function(req, res) {
         const putCommentResult = await feedViewService.feedPutComment(content, userIndex, commentIndex, feedIndex);
         return res.send(response(baseResponse.SUCCESS));
     } catch (err) {
-        console.log(err);
-        console.log('댓글 수정 API 중 에러');
+        logger.error(err);
+        logger.error('댓글 수정 API 중 에러');
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
@@ -183,8 +186,8 @@ exports.deleteComment = async function(req, res) {
         const deleteCommentResult = await feedViewService.feedDeleteComment(userIndex, commentIndex, feedIndex);
         return res.send(response(baseResponse.SUCCESS));
     } catch (err) {
-        console.log(err);
-        console.log('댓글 삭제 API 중 에러');
+        logger.error(err);
+        logger.error('댓글 삭제 API 중 에러');
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
@@ -199,8 +202,8 @@ exports.getSearchLodging = async function(req, res) {
         const searchLodging = await feedViewProvider.searchLodging(lodgings);
         return res.send(response(baseResponse.SUCCESS, searchLodging));
     } catch (err) {
-        console.log(err);
-        console.log('숙소 검색 API 중 에러');
+        logger.error(err);
+        logger.error('숙소 검색 API 중 에러');
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
@@ -214,8 +217,8 @@ exports.getSearchLodging2 = async function(req, res) {
         const searchLodgingResult = await feedViewProvider.searchLodging2(lodgingIndex);
         return res.send(response(baseResponse.SUCCESS, searchLodgingResult));
     } catch (err) {
-        console.log(err);
-        console.log('숙소 검색 API 중 에러');
+        logger.error(err);
+        logger.error('숙소 검색 API 중 에러');
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
@@ -229,8 +232,8 @@ exports.getSearchTag = async function(req, res) {
         const searchTagResult = await feedViewProvider.searchTag(tag);
         return res.send(response(baseResponse.SUCCESS, searchTagResult));
     } catch (err) {
-        console.log(err);
-        console.log('태그 검색 API 중 에러');
+        logger.error(err);
+        logger.error('태그 검색 API 중 에러');
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
@@ -244,8 +247,8 @@ exports.getSearchTag2 = async function(req, res) {
         const searchTagResult = await feedViewProvider.searchTag2(tag);
         return res.send(response(baseResponse.SUCCESS, searchTagResult));
     } catch (err) {
-        console.log(err);
-        console.log('태그 검색 API 중 에러');
+        logger.error(err);
+        logger.error('태그 검색 API 중 에러');
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
@@ -266,8 +269,8 @@ exports.getSearchTotal = async function(req, res) {
 
         return res.send(response(baseResponse.SUCCESS, result));
     } catch (err) {
-        console.log(err);
-        console.log('전체 검색 API 중 에러');
+        logger.error(err);
+        logger.error('전체 검색 API 중 에러');
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
@@ -287,7 +290,8 @@ exports.report = async function(req, res) {
         const feedReportResult = await feedViewService.feedReport(userIndex, feedIndex);
         return res.send(feedReportResult);
     } catch (err) {
-        console.log(err);
+        logger.error(err);
+        logger.error('피드 신고하기 API 중 에러');
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
@@ -302,7 +306,8 @@ exports.likeComment = async function(req, res) {
         return res.send(response(baseResponse.SUCCESS));
         
     } catch (err) {
-        console.log(err);
+        logger.error(err);
+        logger.error('댓글 좋아요 API 중 에러');
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
@@ -316,7 +321,8 @@ exports.dislikeComment = async function(req, res) {
         const feedUnLikeResult = await feedViewService.feedCommentDislike(userIndex, commentIndex);
         return res.send(response(baseResponse.SUCCESS));
     } catch (err) {
-        console.log(err);
+        logger.error(err);
+        logger.error('댓글 싫어요 API 중 에러');
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 }
