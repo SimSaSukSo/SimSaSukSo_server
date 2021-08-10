@@ -21,6 +21,10 @@ exports.getFeed = async function (req, res) {
     const userIndex = token.userIndex
     const feedIndex = req.params.idx
 
+    if(!userIndex || !feedIndex) {
+        return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+    }
+
     try {
         const feedInfoResult = await feedViewProvider.retriveFeedInfo(userIndex, feedIndex);
 
@@ -46,6 +50,10 @@ exports.getComment = async function (req, res) {
     const token = req.verifiedToken;
     const userIndex = token.userIndex;
     const feedIndex = req.params.idx;
+
+    if(!userIndex || !feedIndex) {
+        return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+    }
 
     try {
         const feedCommentResult = await feedViewProvider.retriveFeedComment(userIndex, feedIndex);
@@ -115,6 +123,10 @@ exports.like = async function(req, res) {
     const userIndex = token.userIndex;
     const feedIndex = req.params.idx;
 
+    if(!userIndex || !feedIndex) {
+        return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+    }
+
     try {
         const feedLikeResult = await feedViewProvider.feedLike(userIndex, feedIndex);
         return res.send(response(baseResponse.SUCCESS));
@@ -130,6 +142,10 @@ exports.dislike = async function(req, res) {
     const token = req.verifiedToken;
     const userIndex = token.userIndex;
     const feedIndex = req.params.idx;
+
+    if(!userIndex || !feedIndex) {
+        return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+    }
 
     try {
         const feedUnLikeResult = await feedViewProvider.feedDislike(userIndex, feedIndex);
@@ -148,6 +164,10 @@ exports.postComment = async function(req, res) {
 
     const {content} = req.body;
 
+    if(!userIndex || !feedIndex || !content) {
+        return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+    }
+
     try {
         const postCommentResult = await feedViewService.feedPostComment(userIndex, feedIndex, content);
         return res.send(response(baseResponse.SUCCESS));
@@ -164,6 +184,10 @@ exports.putComment = async function(req, res) {
     const feedIndex = req.params.idx;
 
     const {content, commentIndex} = req.body;
+
+    if(!userIndex || !feedIndex || !commentIndex || !content) {
+        return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+    }
     
     try {
         const putCommentResult = await feedViewService.feedPutComment(content, userIndex, commentIndex, feedIndex);
@@ -182,6 +206,10 @@ exports.deleteComment = async function(req, res) {
 
     const {commentIndex} = req.body;
 
+    if(!userIndex || !feedIndex || !commentIndex) {
+        return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+    }
+
     try {
         const deleteCommentResult = await feedViewService.feedDeleteComment(userIndex, commentIndex, feedIndex);
         return res.send(response(baseResponse.SUCCESS));
@@ -198,6 +226,10 @@ exports.getSearchLodging = async function(req, res) {
 
     const {lodgings} = req.body;
 
+    if(!lodgings) {
+        return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+    }
+
     try {
         const searchLodging = await feedViewProvider.searchLodging(lodgings);
         return res.send(response(baseResponse.SUCCESS, searchLodging));
@@ -212,6 +244,10 @@ exports.getSearchLodging2 = async function(req, res) {
     const token = req.verifiedToken;
     const userIndex = token.userIndex;
     const lodgingIndex = req.params.idx;
+
+    if(!lodgingIndex) {
+        return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+    }
 
     try {
         const searchLodgingResult = await feedViewProvider.searchLodging2(lodgingIndex);
@@ -228,6 +264,10 @@ exports.getSearchTag = async function(req, res) {
     const userIndex = token.userIndex;
     const {tag} = req.body;
 
+    if(!tag) {
+        return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+    }
+
     try {
         const searchTagResult = await feedViewProvider.searchTag(tag);
         return res.send(response(baseResponse.SUCCESS, searchTagResult));
@@ -243,6 +283,10 @@ exports.getSearchTag2 = async function(req, res) {
     const userIndex = token.userIndex;
     const {tag} = req.query;
 
+    if(!tag) {
+        return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+    }
+
     try {
         const searchTagResult = await feedViewProvider.searchTag2(tag);
         return res.send(response(baseResponse.SUCCESS, searchTagResult));
@@ -257,6 +301,10 @@ exports.getSearchTotal = async function(req, res) {
     const token = req.verifiedToken;
     const userIndex = token.userIndex;
     const {searchWord} = req.query;
+
+    if(!searchWord) {
+        return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+    }
 
     try {
         const searchLodging = await feedViewProvider.searchLodging(searchWord);
@@ -301,6 +349,10 @@ exports.likeComment = async function(req, res) {
     const userIndex = token.userIndex;
     const commentIndex = req.params.idx;
 
+    if(!userIndex || !commentIndex) {
+        return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+    }
+
     try {
         const feedLikeResult = await feedViewService.feedCommentLike(userIndex, commentIndex);
         return res.send(response(baseResponse.SUCCESS));
@@ -316,6 +368,10 @@ exports.dislikeComment = async function(req, res) {
     const token = req.verifiedToken;
     const userIndex = token.userIndex;
     const commentIndex = req.params.idx;
+
+    if(!userIndex || !commentIndex) {
+        return res.json(errResponse(baseResponse.UPLOAD_PARAMETER_EMPTY));
+    }
 
     try {
         const feedUnLikeResult = await feedViewService.feedCommentDislike(userIndex, commentIndex);
