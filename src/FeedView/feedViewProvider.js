@@ -266,3 +266,15 @@ exports.retriveFeedInfo = async function (userIndex, feedIndex) {
 
     return tagResult;
   }
+
+  exports.feedCommentUser = async function(userIndex, commentIndex, feedIndex) {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const params = [userIndex, commentIndex, feedIndex];
+    
+    const commentUserResult = await feedViewDao.getCommentUser(connection, params);
+
+    connection.release();
+
+    return commentUserResult;
+  }

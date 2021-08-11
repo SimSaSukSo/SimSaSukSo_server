@@ -47,6 +47,10 @@ module.exports = {
 
     FEEDINDEX_EMPTY : { "isSuccess": false, "code": 2022, "message": "피드를 입력해주세요" },
 
+    COMMENT_PUT_USER : { "isSuccess": false, "code": 2023, "message": "자신이 작성한 댓글만 수정할 수 있습니다." },
+
+    COMMENT_DELETE_USER : { "isSuccess": false, "code": 2024, "message": "자신이 작성한 댓글만 삭제할 수 있습니다." },
+
     REGION_EMPTY : { "isSuccess": false, "code": 2030, "message": "지역을 입력해주세요." },
 
     // related upload
@@ -56,7 +60,7 @@ module.exports = {
     // related saved list
     SL_PARAMETER_INVALID : { "isSuccess": false, "code": 2050, "message": "존재하지 않는 찜목록입니다." },
 
-    JWT_USER_INVALID : { "isSuccess": false, "code": 2060, "message": "존재하지 않는 유저입니다." },
+    JWT_USER_INVALID : { "isSuccess": false, "code": 2060, "message": "해당 회원이 존재하지 않습니다." },
 
     // Response error
     SIGNUP_REDUNDANT_EMAIL : { "isSuccess": false, "code": 3001, "message":"중복된 이메일입니다." },

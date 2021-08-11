@@ -1092,6 +1092,15 @@ async function updateFeedCommentDislike(connection, param) {
     return feedDisike
 }
 
+async function getCommentUser(connection, param) {
+    const selectCommentUserQuery = `
+        SELECT * FROM Comment WHERE userIndex = ? and commentIndex = ? and feedIndex = ?;
+    `;
+
+    const [commentUser] = await connection.query(selectCommentUserQuery, param);
+    return commentUser
+}
+
 module.exports = {
     selectImageList,
     selectLike,
@@ -1150,5 +1159,6 @@ module.exports = {
     updateFeedCommentLike,
     updateFeedCommentDislike,
     checkFeedCommentLike,
+    getCommentUser,
 };
   

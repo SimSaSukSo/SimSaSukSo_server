@@ -45,9 +45,6 @@ const apple = new AppleAuth(appleAuthConfig, path.join(__dirname,'../../config/a
             nickname = response.data.kakao_account.profile.nickname;
 
             logger.info(kakaoId);
-            logger.info(email);
-            logger.info(avartarUrl);
-            logger.info(nickname);
 
             try {
                 const userResult = await userProvider.retrieveUserKakaoId(kakaoId);
@@ -63,26 +60,33 @@ const apple = new AppleAuth(appleAuthConfig, path.join(__dirname,'../../config/a
 
                         let userIndex = userResult[0].userIndex;
                         // 회원가입 시 토큰 생성
-                        let token = await jwt.sign(
-                            {
-                                userIndex: userIndex
-                            }, // 토큰의 내용(payload)
-                            secret_config.jwtsecret, // 비밀키
-                            {
-                                expiresIn: "365d",
-                                subject: "userInfo",
-                            } // 유효 기간 365일
-                        );
-
-                        // 토큰 생성 성공
-                        if (token) {
-                            
-                            loginAgainResult.token = token;
-                            return res.send(loginAgainResult);
+                        try {
+                            let token = await jwt.sign(
+                                {
+                                    userIndex: userIndex
+                                }, // 토큰의 내용(payload)
+                                secret_config.jwtsecret, // 비밀키
+                                {
+                                    expiresIn: "365d",
+                                    subject: "userInfo",
+                                } // 유효 기간 365일
+                            );
+    
+                            // 토큰 생성 성공
+                            if (token) {
+                                
+                                loginAgainResult.token = token;
+                                return res.send(loginAgainResult);
+                            }
+    
+                        } catch (err) {
+                            logger.error(err);
+                            logger.error('재로그인 토큰 생성 중 에러');
+                            return res.json(errResponse(baseResponse.CREATE_TOKEN_ERROR));
                         }
-
+                        
                     } catch (err) {
-                        console.log(err)
+                        logger.error(err)
                         logger.error(`재로그인 중 Error`);
                         return res.json(errResponse(baseResponse.SERVER_ERROR));
                     }
@@ -108,7 +112,7 @@ const apple = new AppleAuth(appleAuthConfig, path.join(__dirname,'../../config/a
                 // userIndex = newUserResult[0].userIndex;
                 userIndex = userIndexResult;
             } catch (err) {
-                console.log(err);
+                logger.error(err);
                 logger.error(`신규 유저 생성 중 Error`);
                 return res.json(errResponse(baseResponse.DB_ERROR));
             }
@@ -127,8 +131,8 @@ const apple = new AppleAuth(appleAuthConfig, path.join(__dirname,'../../config/a
                 } // 유효 기간 365일
                 );
             } catch (err) {
-                console.log(err);
-                logger.error(`토큰 생성 중 Error`);
+                logger.error(err);
+                logger.error(`처음 회원가입 시 토큰 생성 중 Error`);
                 return res.json(errResponse(baseResponse.CREATE_TOKEN_ERROR));
             }
 
@@ -159,7 +163,7 @@ const apple = new AppleAuth(appleAuthConfig, path.join(__dirname,'../../config/a
             
             });
     } catch (err) {
-        console.log(err);
+        logger.error(err);
         logger.error(`카카오 소셜 로그인/회원가입 중 Error`);
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
@@ -197,7 +201,7 @@ exports.setNickname = async function (req, res) {
                 return res.json(errResponse(baseResponse.NICKNAME_INVALID));
             }
         } catch (err) {
-            console.log(err);
+            logger.error(err);
             logger.error(`닉네임 영문/숫자 포함 8자 이내 여부 확인 중 Error`);
             return res.json(errResponse(baseResponse.DB_ERROR));
         }
@@ -210,7 +214,7 @@ exports.setNickname = async function (req, res) {
                 return res.json(errResponse(baseResponse.NICKNAME_REDUNDANT));
             }
         } catch (err) {
-            console.log(err);
+            logger.error(err);
             logger.error(`닉네임 중복 여부 확인 중 Error`);
             return res.json(errResponse(baseResponse.DB_ERROR));
         }
@@ -220,14 +224,14 @@ exports.setNickname = async function (req, res) {
             const nicknameResponse = await userService.setNickname(nickname, userIndex);
             return res.send(nicknameResponse);
         } catch (err) {
-            logger.error(`닉네임 설정 중 Error\n: ${JSON.stringify(err)}`);
+            logger.error(err);
+            logger.error(`닉네임 설정 중 Error`);
             return res.json(errResponse(baseResponse.DB_ERROR));
         }
 
-        
-
     } catch(err) {
-        logger.error(`닉네임 설정 API 중 Error\n: ${JSON.stringify(err)}`);
+        logger.error(err);
+        logger.error(`닉네임 설정 API 중 Error`);
         return res.json(errResponse(baseResponse.DB_ERROR));
     }
 
