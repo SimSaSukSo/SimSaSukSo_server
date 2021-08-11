@@ -190,6 +190,11 @@ exports.putComment = async function(req, res) {
     }
     
     try {
+        const commentUserResult = await feedViewProvider.feedCommentUser(userIndex, commentIndex, feedIndex);
+
+        if(commentUserResult == null || commentUserResult == undefined || commentUserResult.length == 0) {
+            return res.json(errResponse(baseResponse.COMMENT_PUT_USER));
+        }
         const putCommentResult = await feedViewService.feedPutComment(content, userIndex, commentIndex, feedIndex);
         return res.send(response(baseResponse.SUCCESS));
     } catch (err) {
@@ -211,6 +216,11 @@ exports.deleteComment = async function(req, res) {
     }
 
     try {
+        const commentUserResult = await feedViewProvider.feedCommentUser(userIndex, commentIndex, feedIndex);
+
+        if(commentUserResult == null || commentUserResult == undefined || commentUserResult.length == 0) {
+            return res.json(errResponse(baseResponse.COMMENT_DELETE_USER));
+        }
         const deleteCommentResult = await feedViewService.feedDeleteComment(userIndex, commentIndex, feedIndex);
         return res.send(response(baseResponse.SUCCESS));
     } catch (err) {

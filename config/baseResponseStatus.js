@@ -47,6 +47,10 @@ module.exports = {
 
     FEEDINDEX_EMPTY : { "isSuccess": false, "code": 2022, "message": "피드를 입력해주세요" },
 
+    COMMENT_PUT_USER : { "isSuccess": false, "code": 2023, "message": "자신이 작성한 댓글만 수정할 수 있습니다." },
+
+    COMMENT_DELETE_USER : { "isSuccess": false, "code": 2024, "message": "자신이 작성한 댓글만 삭제할 수 있습니다." },
+
     REGION_EMPTY : { "isSuccess": false, "code": 2030, "message": "지역을 입력해주세요." },
 
     // related upload
